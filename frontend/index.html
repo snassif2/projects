@@ -1,0 +1,1124 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>VozLab — Triagem Vocal / Voice Screening</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <style>
+    /* ── Reset & tokens ────────────────────────────────────────────────── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:        #0d1117;
+      --surface:   #161b22;
+      --border:    #30363d;
+      --ink:       #e6edf3;
+      --ink-muted: #8b949e;
+      --teal:      #2dd4bf;
+      --teal-dim:  #134e4a;
+      --amber:     #fbbf24;
+      --red:       #f87171;
+      --green:     #4ade80;
+      --radius:    14px;
+      --shadow:    0 8px 32px rgba(0,0,0,.45);
+      font-family: 'DM Sans', system-ui, sans-serif;
+      font-size: 16px;
+      color: var(--ink);
+      background: var(--bg);
+    }
+
+    body {
+      min-height: 100dvh;
+      display: grid;
+      place-items: center;
+      padding: 24px 16px;
+      background: radial-gradient(ellipse 70% 60% at 50% -10%, #0e3a3a 0%, var(--bg) 65%);
+    }
+
+    /* ── Shell ─────────────────────────────────────────────────────────── */
+    .card {
+      width: 100%;
+      max-width: 520px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      overflow: hidden;
+    }
+
+    .card-header {
+      padding: 28px 32px 20px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .brand { display: flex; flex-direction: column; gap: 2px; }
+    .brand-name {
+      font-family: 'DM Serif Display', serif;
+      font-size: 1.6rem;
+      color: var(--teal);
+      letter-spacing: -0.02em;
+    }
+    .brand-sub { font-size: .8rem; color: var(--ink-muted); font-weight: 300; }
+
+    .lang-toggle {
+      display: flex;
+      gap: 4px;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 3px;
+      flex-shrink: 0;
+    }
+    .lang-btn {
+      background: none; border: none; cursor: pointer;
+      font-size: .75rem; font-weight: 600; color: var(--ink-muted);
+      padding: 4px 10px; border-radius: 5px; transition: all .15s;
+    }
+    .lang-btn.active { background: var(--teal-dim); color: var(--teal); }
+
+    .card-body { padding: 28px 32px; }
+
+    /* ── Steps ─────────────────────────────────────────────────────────── */
+    .step { display: none; }
+    .step.active { display: block; }
+
+    /* ── Step 1 — Instructions ─────────────────────────────────────────── */
+    .step-title {
+      font-family: 'DM Serif Display', serif;
+      font-size: 1.3rem;
+      color: var(--ink);
+      margin-bottom: 12px;
+      line-height: 1.3;
+    }
+    .instruction-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      margin: 20px 0 24px;
+    }
+    .instruction-list li {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      font-size: .9rem;
+      color: var(--ink-muted);
+      line-height: 1.5;
+    }
+    .instruction-list .num {
+      flex-shrink: 0;
+      width: 22px; height: 22px;
+      border-radius: 50%;
+      background: var(--teal-dim);
+      color: var(--teal);
+      font-size: .75rem;
+      font-weight: 600;
+      display: grid; place-items: center;
+    }
+    .duration-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: var(--teal-dim);
+      color: var(--teal);
+      border-radius: 6px;
+      padding: 6px 14px;
+      font-size: .82rem;
+      font-weight: 500;
+      margin-bottom: 20px;
+    }
+    .disclaimer {
+      font-size: .78rem;
+      color: var(--ink-muted);
+      background: rgba(255,255,255,.03);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 10px 14px;
+      margin-bottom: 24px;
+      line-height: 1.5;
+    }
+
+    /* ── Buttons ───────────────────────────────────────────────────────── */
+    .btn {
+      width: 100%; padding: 14px;
+      border: none; border-radius: 10px;
+      font-family: inherit; font-size: .95rem; font-weight: 600;
+      cursor: pointer; transition: all .2s; letter-spacing: .01em;
+    }
+    .btn-primary {
+      background: var(--teal);
+      color: #0d1117;
+    }
+    .btn-primary:hover { filter: brightness(1.1); transform: translateY(-1px); }
+    .btn-primary:disabled { opacity: .4; cursor: not-allowed; transform: none; }
+    .btn-secondary {
+      background: transparent;
+      color: var(--ink-muted);
+      border: 1px solid var(--border);
+      margin-top: 10px;
+    }
+    .btn-secondary:hover { border-color: var(--ink-muted); color: var(--ink); }
+
+    /* ── Step 2 — Recording ────────────────────────────────────────────── */
+    .record-area {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 24px;
+      padding: 12px 0;
+    }
+
+    .waveform-ring {
+      position: relative;
+      width: 120px; height: 120px;
+    }
+    .waveform-ring svg { position: absolute; inset: 0; width: 100%; height: 100%; }
+    .ring-track { fill: none; stroke: var(--border); stroke-width: 4; }
+    .ring-progress {
+      fill: none; stroke: var(--teal); stroke-width: 4;
+      stroke-linecap: round;
+      stroke-dasharray: 339.3;   /* 2π × 54 */
+      stroke-dashoffset: 339.3;
+      transform: rotate(-90deg);
+      transform-origin: center;
+      transition: stroke-dashoffset .5s linear;
+    }
+    .ring-inner {
+      position: absolute;
+      inset: 14px;
+      background: var(--bg);
+      border-radius: 50%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 2px;
+    }
+    .ring-timer {
+      font-family: 'DM Serif Display', serif;
+      font-size: 1.5rem;
+      color: var(--ink);
+      line-height: 1;
+    }
+    .ring-label { font-size: .65rem; color: var(--ink-muted); text-transform: uppercase; letter-spacing: .08em; }
+
+    .record-btn {
+      width: 64px; height: 64px;
+      border-radius: 50%;
+      border: none; cursor: pointer;
+      background: var(--teal);
+      display: grid; place-items: center;
+      transition: all .2s;
+      box-shadow: 0 0 0 0 rgba(45,212,191,.4);
+    }
+    .record-btn.recording {
+      background: var(--red);
+      animation: pulse 1.4s ease-in-out infinite;
+    }
+    @keyframes pulse {
+      0%, 100% { box-shadow: 0 0 0 0 rgba(248,113,113,.4); }
+      50%        { box-shadow: 0 0 0 14px rgba(248,113,113,.0); }
+    }
+    .record-btn svg { width: 22px; height: 22px; }
+
+    .rec-status {
+      font-size: .85rem;
+      color: var(--ink-muted);
+      text-align: center;
+      min-height: 20px;
+    }
+    .rec-status.live { color: var(--red); font-weight: 500; }
+
+    /* ── Step 3 — Processing ───────────────────────────────────────────── */
+    .processing-area {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 20px;
+      padding: 16px 0;
+      text-align: center;
+    }
+    .spinner {
+      width: 48px; height: 48px;
+      border: 3px solid var(--border);
+      border-top-color: var(--teal);
+      border-radius: 50%;
+      animation: spin 0.9s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .processing-steps { display: flex; flex-direction: column; gap: 8px; width: 100%; }
+    .proc-step {
+      display: flex; align-items: center; gap: 10px;
+      font-size: .83rem; color: var(--ink-muted);
+      padding: 8px 12px;
+      border-radius: 8px;
+      background: rgba(255,255,255,.02);
+      transition: all .3s;
+    }
+    .proc-step.done { color: var(--teal); background: rgba(45,212,191,.06); }
+    .proc-step.active { color: var(--ink); background: rgba(255,255,255,.04); }
+    .proc-dot {
+      width: 8px; height: 8px; border-radius: 50%; background: var(--border); flex-shrink: 0;
+    }
+    .proc-step.done .proc-dot { background: var(--teal); }
+    .proc-step.active .proc-dot { background: var(--amber); animation: blink .9s ease-in-out infinite; }
+    @keyframes blink { 0%,100%{opacity:1} 50%{opacity:.3} }
+
+    /* ── Step 4 — Results ──────────────────────────────────────────────── */
+    .score-display {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+      padding: 24px 0 20px;
+    }
+    .score-ring { position: relative; width: 110px; height: 110px; }
+    .score-ring svg { width: 100%; height: 100%; }
+    .score-bg { fill: none; stroke: var(--border); stroke-width: 6; }
+    .score-fill {
+      fill: none; stroke-width: 6; stroke-linecap: round;
+      stroke-dasharray: 283; /* 2π × 45 */
+      stroke-dashoffset: 283;
+      transform: rotate(-90deg); transform-origin: center;
+      transition: stroke-dashoffset 1.2s cubic-bezier(.4,0,.2,1), stroke .4s;
+    }
+    .score-number {
+      position: absolute; inset: 0;
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+    }
+    .score-val { font-family: 'DM Serif Display', serif; font-size: 1.8rem; line-height: 1; }
+    .score-max { font-size: .7rem; color: var(--ink-muted); }
+    .score-badge {
+      display: inline-block;
+      font-size: .75rem; font-weight: 600;
+      padding: 4px 12px; border-radius: 20px;
+      text-transform: uppercase; letter-spacing: .06em;
+    }
+    .badge-low      { background: rgba(74,222,128,.12); color: var(--green); }
+    .badge-moderate { background: rgba(251,191,36,.12);  color: var(--amber); }
+    .badge-high     { background: rgba(248,113,113,.12); color: var(--red);   }
+
+    .patient-msg {
+      font-size: .92rem; color: var(--ink); text-align: center;
+      line-height: 1.55; margin-bottom: 20px;
+    }
+
+    .recommendations {
+      display: flex; flex-direction: column; gap: 8px; margin-bottom: 20px;
+    }
+    .rec-item {
+      display: flex; align-items: flex-start; gap: 10px;
+      font-size: .83rem; color: var(--ink-muted); line-height: 1.5;
+      background: rgba(255,255,255,.025);
+      border: 1px solid var(--border);
+      border-radius: 8px; padding: 10px 12px;
+    }
+    .rec-icon { flex-shrink: 0; color: var(--teal); margin-top: 1px; }
+
+    .details-toggle {
+      width: 100%; background: none; border: 1px solid var(--border);
+      border-radius: 8px; padding: 10px 14px;
+      color: var(--ink-muted); font-family: inherit; font-size: .82rem;
+      cursor: pointer; text-align: left; transition: border-color .2s;
+      display: flex; align-items: center; justify-content: space-between;
+      margin-bottom: 8px;
+    }
+    .details-toggle:hover { border-color: var(--teal); color: var(--ink); }
+    .details-toggle .chevron { transition: transform .2s; }
+    .details-toggle.open .chevron { transform: rotate(180deg); }
+
+    .details-grid {
+      display: none;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      margin-bottom: 20px;
+    }
+    .details-grid.open { display: grid; }
+    .metric-card {
+      background: rgba(255,255,255,.02);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 10px 12px;
+    }
+    .metric-label { font-size: .7rem; color: var(--ink-muted); text-transform: uppercase; letter-spacing: .06em; margin-bottom: 4px; }
+    .metric-value { font-size: 1rem; font-weight: 600; color: var(--ink); }
+    .metric-value.ok   { color: var(--green); }
+    .metric-value.warn { color: var(--amber); }
+    .metric-value.bad  { color: var(--red); }
+
+    /* ── Volume indicator ──────────────────────────────────────────────── */
+    .volume-bar-wrap {
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
+    }
+    .volume-label {
+      font-size: .72rem;
+      color: var(--ink-muted);
+      letter-spacing: .05em;
+      text-transform: uppercase;
+      min-height: 16px;
+      transition: color .2s;
+    }
+    .volume-label.good  { color: var(--green); }
+    .volume-label.low   { color: var(--ink-muted); }
+    .volume-label.loud  { color: var(--amber); }
+    .volume-track {
+      width: 80%;
+      height: 6px;
+      background: var(--border);
+      border-radius: 3px;
+      overflow: hidden;
+    }
+    .volume-fill {
+      height: 100%;
+      width: 0%;
+      border-radius: 3px;
+      background: var(--border);
+      transition: width .08s linear, background .2s;
+    }
+    .volume-fill.good  { background: var(--green); }
+    .volume-fill.low   { background: var(--ink-muted); }
+    .volume-fill.loud  { background: var(--amber); }
+
+    /* ── Error state ───────────────────────────────────────────────────── */
+    .error-box {
+      background: rgba(248,113,113,.08);
+      border: 1px solid rgba(248,113,113,.3);
+      border-radius: 10px;
+      padding: 16px;
+      color: var(--red);
+      font-size: .88rem;
+      line-height: 1.5;
+      margin-bottom: 20px;
+    }
+
+    @media (max-width: 400px) {
+      .card-body { padding: 20px 18px; }
+      .card-header { padding: 20px 18px 16px; }
+      .details-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="card">
+
+  <!-- Header -->
+  <div class="card-header">
+    <div class="brand">
+      <span class="brand-name">VozLab</span>
+      <span class="brand-sub" data-i18n="brand-sub">Triagem Vocal · Voice Screening</span>
+    </div>
+    <div class="lang-toggle">
+      <button class="lang-btn active" onclick="setLang('pt')" id="btn-pt">PT</button>
+      <button class="lang-btn"        onclick="setLang('en')" id="btn-en">EN</button>
+    </div>
+  </div>
+
+  <!-- Body -->
+  <div class="card-body">
+
+    <!-- ── Step 1: Instructions ─────────────────────────────────────── -->
+    <div class="step active" id="step-1">
+      <h2 class="step-title" data-i18n="s1-title">Avalie sua voz em poucos segundos</h2>
+
+      <div class="duration-badge">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+        <span data-i18n="s1-duration">5 – 10 segundos de fonação sustentada</span>
+      </div>
+
+      <ul class="instruction-list">
+        <li><span class="num">1</span><span data-i18n="s1-i1">Encontre um ambiente silencioso e segure o telefone a ~15 cm da boca.</span></li>
+        <li><span class="num">2</span><span data-i18n="s1-i2">Ao iniciar, inspire fundo e diga <strong>"Aaaah"</strong> em tom confortável e constante.</span></li>
+        <li><span class="num">3</span><span data-i18n="s1-i3">A gravação para automaticamente aos 10 s. Você pode parar antes se preferir.</span></li>
+        <li><span class="num">4</span><span data-i18n="s1-i4">Mínimo de 5 s de fonação para análise confiável.</span></li>
+      </ul>
+
+      <p class="disclaimer" data-i18n="s1-disclaimer">
+        ⚠️ Esta é uma triagem informativa, não um diagnóstico clínico.
+        Os resultados não substituem avaliação por fonoaudiólogo ou médico.
+      </p>
+
+      <button class="btn btn-primary" onclick="goStep(2)" data-i18n="s1-cta">
+        Iniciar triagem
+      </button>
+    </div>
+
+    <!-- ── Step 2: Recording ────────────────────────────────────────── -->
+    <div class="step" id="step-2">
+      <h2 class="step-title" data-i18n="s2-title">Grave sua voz</h2>
+
+      <div class="record-area">
+        <div class="waveform-ring">
+          <svg viewBox="0 0 120 120">
+            <circle class="ring-track" cx="60" cy="60" r="54" />
+            <circle class="ring-progress" id="ring-progress" cx="60" cy="60" r="54" />
+          </svg>
+          <div class="ring-inner">
+            <span class="ring-timer" id="timer-display">0:00</span>
+            <span class="ring-label" id="timer-label" data-i18n="s2-timer-idle">pronto</span>
+          </div>
+        </div>
+
+        <button class="record-btn" id="record-btn" onclick="toggleRecording()">
+          <!-- mic icon -->
+          <svg id="icon-mic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/>
+            <path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/>
+            <line x1="8" y1="23" x2="16" y2="23"/>
+          </svg>
+          <!-- stop icon (hidden) -->
+          <svg id="icon-stop" viewBox="0 0 24 24" fill="currentColor" style="display:none">
+            <rect x="4" y="4" width="16" height="16" rx="2"/>
+          </svg>
+        </button>
+
+        <p class="rec-status" id="rec-status" data-i18n="s2-status-idle">
+          Toque para iniciar gravação
+        </p>
+
+        <div class="volume-bar-wrap" id="volume-wrap" style="display:none">
+          <div class="volume-track"><div class="volume-fill" id="volume-fill"></div></div>
+          <span class="volume-label" id="volume-label"></span>
+        </div>
+      </div>
+
+      <button class="btn btn-secondary" onclick="goStep(1)" data-i18n="s2-back">← Voltar</button>
+    </div>
+
+    <!-- ── Step 3: Processing ───────────────────────────────────────── -->
+    <div class="step" id="step-3">
+      <div class="processing-area">
+        <div class="spinner"></div>
+        <p style="font-size:.9rem; color:var(--ink-muted)" data-i18n="s3-title">Analisando sua voz…</p>
+        <div class="processing-steps">
+          <div class="proc-step active" id="ps-upload">
+            <span class="proc-dot"></span>
+            <span data-i18n="ps-upload">Enviando áudio</span>
+          </div>
+          <div class="proc-step" id="ps-extract">
+            <span class="proc-dot"></span>
+            <span data-i18n="ps-extract">Extraindo parâmetros acústicos</span>
+          </div>
+          <div class="proc-step" id="ps-score">
+            <span class="proc-dot"></span>
+            <span data-i18n="ps-score">Calculando pontuação vocal</span>
+          </div>
+          <div class="proc-step" id="ps-result">
+            <span class="proc-dot"></span>
+            <span data-i18n="ps-result">Preparando resultado</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── Step 4: Results ──────────────────────────────────────────── -->
+    <div class="step" id="step-4">
+
+      <div class="score-display">
+        <div class="score-ring">
+          <svg viewBox="0 0 100 100">
+            <circle class="score-bg" cx="50" cy="50" r="45"/>
+            <circle class="score-fill" id="score-arc" cx="50" cy="50" r="45"/>
+          </svg>
+          <div class="score-number">
+            <span class="score-val" id="score-val">—</span>
+            <span class="score-max">/10</span>
+          </div>
+        </div>
+        <span class="score-badge" id="score-badge"></span>
+      </div>
+
+      <p class="patient-msg" id="patient-msg"></p>
+
+      <div class="recommendations" id="recs-list"></div>
+
+      <button class="details-toggle" id="details-toggle" onclick="toggleDetails()">
+        <span data-i18n="details-toggle">Detalhes técnicos</span>
+        <svg class="chevron" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+      </button>
+      <div class="details-grid" id="details-grid"></div>
+
+      <button class="btn btn-primary" onclick="restart()" data-i18n="s4-restart">
+        Nova triagem
+      </button>
+    </div>
+
+  </div><!-- /card-body -->
+</div><!-- /card -->
+
+<script>
+/* ══════════════════════════════════════════════════════════════════════════
+   CONFIG — reads limits from the API so the frontend never hardcodes them
+   ══════════════════════════════════════════════════════════════════════════ */
+const API_BASE = (window.VOZLAB_API_URL || 'https://lxs48psrg9.execute-api.us-east-1.amazonaws.com').replace(/\/$/, '');
+
+// Defaults — overwritten by GET /config on load
+let CFG = {
+  max_duration_seconds: 10,
+  min_duration_seconds: 5,
+  allowed_mime_types: ['audio/webm;codecs=opus','audio/ogg;codecs=opus','audio/wav'],
+};
+
+async function loadConfig() {
+  try {
+    const r = await fetch(`${API_BASE}/config`);
+    if (r.ok) CFG = await r.json();
+  } catch (_) { /* use defaults */ }
+}
+
+/* ══════════════════════════════════════════════════════════════════════════
+   i18n
+   ══════════════════════════════════════════════════════════════════════════ */
+const I18N = {
+  'pt': {
+    'brand-sub':      'Triagem Vocal · Voice Screening',
+    's1-title':       'Avalie sua voz em poucos segundos',
+    's1-duration':    `5 – 10 segundos de fonação sustentada`,
+    's1-i1':          'Encontre um ambiente silencioso e segure o telefone a ~15 cm da boca.',
+    's1-i2':          'Ao iniciar, inspire fundo e diga <strong>"Aaaah"</strong> em tom confortável e constante.',
+    's1-i3':          'Sustente até sentir falta de ar — a gravação para automaticamente. Quanto mais longo, melhor o resultado.',
+    's1-i4':          `Mínimo de 5 s. Tente sustentar até o fim — esse tempo é medido clinicamente.`,
+    's1-disclaimer':  '⚠️ Esta é uma triagem informativa, não um diagnóstico clínico. Os resultados não substituem avaliação por fonoaudiólogo ou médico.',
+    's1-cta':         'Iniciar triagem',
+    's2-title':       'Grave sua voz',
+    's2-timer-idle':  'pronto',
+    's2-timer-live':  'gravando',
+    's2-status-idle': 'Toque para iniciar gravação',
+    's2-status-live': '● Gravando — diga "Aaaah"',
+    's2-status-done': 'Gravação concluída',
+    's2-back':        '← Voltar',
+    's3-title':       'Analisando sua voz…',
+    'ps-upload':      'Enviando áudio',
+    'ps-extract':     'Extraindo parâmetros acústicos',
+    'ps-score':       'Calculando pontuação vocal',
+    'ps-result':      'Preparando resultado',
+    'details-toggle': 'Detalhes técnicos',
+    's4-restart':     'Nova triagem',
+    'risk-low':       'Risco baixo',
+    'risk-moderate':  'Risco moderado',
+    'risk-high':      'Risco elevado',
+    'metric-f0':      'F0 médio',
+    'metric-jitter':  'Jitter',
+    'metric-shimmer': 'Shimmer',
+    'metric-hnr':     'HNR',
+    'metric-voiced':  '% Vozeado',
+    'metric-stability':'Estabilidade',
+    'metric-mpt':     'TMF (fonação)',
+    'mpt-normal':     'Normal',
+    'mpt-borderline': 'Limítrofe',
+    'mpt-low':        'Reduzido',
+    'vol-low':        'muito baixo',
+    'vol-good':       'bom nível',
+    'vol-loud':       'muito alto',
+    'err-short':      'Gravação muito curta. Grave pelo menos 5 s de fonação.',
+    'err-generic':    'Não foi possível analisar o áudio. Tente novamente.',
+    'err-mic':        'Microfone não autorizado. Permita o acesso e tente novamente.',
+  },
+  'en': {
+    'brand-sub':      'Triagem Vocal · Voice Screening',
+    's1-title':       'Screen your voice in seconds',
+    's1-duration':    `5 – 10 seconds of sustained phonation`,
+    's1-i1':          'Find a quiet place and hold the phone ~15 cm from your mouth.',
+    's1-i2':          'Take a deep breath and say a steady <strong>"Aaaah"</strong> at a comfortable pitch.',
+    's1-i3':          'Sustain until you run out of breath — the recording stops automatically. Longer is better.',
+    's1-i4':          `Minimum 5 s. Try to sustain until the end — that time is measured clinically.`,
+    's1-disclaimer':  '⚠️ This is an informational screening, not a clinical diagnosis. Results do not replace evaluation by a speech therapist or physician.',
+    's1-cta':         'Start screening',
+    's2-title':       'Record your voice',
+    's2-timer-idle':  'ready',
+    's2-timer-live':  'recording',
+    's2-status-idle': 'Tap to start recording',
+    's2-status-live': '● Recording — say "Aaaah"',
+    's2-status-done': 'Recording complete',
+    's2-back':        '← Back',
+    's3-title':       'Analysing your voice…',
+    'ps-upload':      'Uploading audio',
+    'ps-extract':     'Extracting acoustic parameters',
+    'ps-score':       'Computing vocal score',
+    'ps-result':      'Preparing result',
+    'details-toggle': 'Technical details',
+    's4-restart':     'New screening',
+    'risk-low':       'Low risk',
+    'risk-moderate':  'Moderate risk',
+    'risk-high':      'High risk',
+    'metric-f0':      'Mean F0',
+    'metric-jitter':  'Jitter',
+    'metric-shimmer': 'Shimmer',
+    'metric-hnr':     'HNR',
+    'metric-voiced':  '% Voiced',
+    'metric-stability':'Stability',
+    'metric-mpt':     'MPT (phonation)',
+    'mpt-normal':     'Normal',
+    'mpt-borderline': 'Borderline',
+    'mpt-low':        'Reduced',
+    'vol-low':        'too quiet',
+    'vol-good':       'good level',
+    'vol-loud':       'too loud',
+    'err-short':      'Recording too short. Please record at least 5 s of phonation.',
+    'err-generic':    'Could not analyse audio. Please try again.',
+    'err-mic':        'Microphone not allowed. Please grant access and try again.',
+  }
+};
+
+let lang = 'pt';
+function t(key) { return I18N[lang][key] || key; }
+
+function setLang(l) {
+  lang = l;
+  document.getElementById('btn-pt').classList.toggle('active', l === 'pt');
+  document.getElementById('btn-en').classList.toggle('active', l === 'en');
+  document.querySelectorAll('[data-i18n]').forEach(el => {
+    const key = el.getAttribute('data-i18n');
+    el.innerHTML = t(key);
+  });
+  // Update duration badge dynamically
+  document.querySelector('[data-i18n="s1-duration"]').textContent =
+    `5 – ${CFG.max_duration_seconds} ${l === 'pt' ? 'segundos de fonação sustentada' : 'seconds of sustained phonation'}`;
+}
+
+/* ══════════════════════════════════════════════════════════════════════════
+   NAVIGATION
+   ══════════════════════════════════════════════════════════════════════════ */
+function goStep(n) {
+  document.querySelectorAll('.step').forEach((s, i) => {
+    s.classList.toggle('active', i + 1 === n);
+  });
+}
+
+/* ══════════════════════════════════════════════════════════════════════════
+   RECORDING — Web Audio API + client-side WAV encoding
+   Works in Chrome, Firefox, Safari. No MediaRecorder, no ffmpeg needed.
+   ══════════════════════════════════════════════════════════════════════════ */
+let pcmChunks      = [];   // Float32Array chunks collected during recording
+let recordStream   = null;
+let scriptNode     = null;
+let timerInterval  = null;
+let elapsedSec     = 0;
+let isRecording    = false;
+let audioContext   = null;
+let volumeAnimFrame = null;
+
+const CIRCUMFERENCE = 339.3;  // 2π × 54
+const RECORD_SR     = 22050;  // target sample rate — matches backend TARGET_SR
+
+async function toggleRecording() {
+  if (isRecording) stopRecording();
+  else await startRecording();
+}
+
+async function startRecording() {
+  try {
+    recordStream = await navigator.mediaDevices.getUserMedia({
+      audio: {
+        echoCancellation: false,
+        noiseSuppression: false,
+        autoGainControl:  false,
+        channelCount:     1,
+      }
+    });
+
+    audioContext = new AudioContext({ sampleRate: RECORD_SR });
+    const source  = audioContext.createMediaStreamSource(recordStream);
+
+    // Volume monitor
+    const analyser = audioContext.createAnalyser();
+    analyser.fftSize = 256;
+    source.connect(analyser);
+    startVolumeMonitor(analyser);
+
+    // PCM capture via ScriptProcessorNode
+    pcmChunks  = [];
+    scriptNode = audioContext.createScriptProcessor(4096, 1, 1);
+    scriptNode.onaudioprocess = e => {
+      pcmChunks.push(new Float32Array(e.inputBuffer.getChannelData(0)));
+    };
+    source.connect(scriptNode);
+    scriptNode.connect(audioContext.destination);
+
+    isRecording = true;
+    elapsedSec  = 0;
+
+    document.getElementById('volume-wrap').style.display = '';
+
+    // UI
+    document.getElementById('record-btn').classList.add('recording');
+    document.getElementById('icon-mic').style.display  = 'none';
+    document.getElementById('icon-stop').style.display = 'block';
+    document.getElementById('rec-status').className    = 'rec-status live';
+    document.getElementById('rec-status').textContent  = t('s2-status-live');
+    document.getElementById('timer-label').textContent = t('s2-timer-live');
+
+    timerInterval = setInterval(() => {
+      elapsedSec++;
+      updateTimer(elapsedSec);
+      if (elapsedSec >= CFG.max_duration_seconds) stopRecording();
+    }, 1000);
+
+  } catch (err) {
+    showError(t('err-mic'), null);
+  }
+}
+
+function stopRecording() {
+  if (!isRecording) return;
+  clearInterval(timerInterval);
+  isRecording = false;
+
+  // Disconnect PCM capture node
+  if (scriptNode) { scriptNode.disconnect(); scriptNode = null; }
+
+  // Stop mic stream
+  if (recordStream) { recordStream.getTracks().forEach(t => t.stop()); recordStream = null; }
+
+  // Stop volume monitor and close AudioContext
+  stopVolumeMonitor();
+
+  // UI
+  document.getElementById('record-btn').classList.remove('recording');
+  document.getElementById('icon-mic').style.display  = 'block';
+  document.getElementById('icon-stop').style.display = 'none';
+  document.getElementById('rec-status').className    = 'rec-status';
+  document.getElementById('rec-status').textContent  = t('s2-status-done');
+  document.getElementById('timer-label').textContent  = t('s2-timer-idle');
+  document.getElementById('volume-wrap').style.display = 'none';
+
+  // Kick off upload
+  handleRecordingDone();
+}
+
+function startVolumeMonitor(analyser) {
+  const data = new Uint8Array(analyser.frequencyBinCount);
+  function tick() {
+    analyser.getByteTimeDomainData(data);
+    let sum = 0;
+    for (let i = 0; i < data.length; i++) {
+      const v = (data[i] - 128) / 128;
+      sum += v * v;
+    }
+    const rms = Math.sqrt(sum / data.length);
+    const db  = 20 * Math.log10(Math.max(rms, 1e-7));
+    // db range: ~-60 (silence) to 0 (clip)
+    // map -50..–5 dB → 0..100%
+    const pct   = Math.min(100, Math.max(0, (db + 50) / 45 * 100));
+    const state = db < -35 ? 'low' : db > -10 ? 'loud' : 'good';
+
+    const fill  = document.getElementById('volume-fill');
+    const label = document.getElementById('volume-label');
+    fill.style.width = pct + '%';
+    fill.className   = 'volume-fill ' + state;
+    label.className  = 'volume-label ' + state;
+    label.textContent = t('vol-' + state);
+
+    volumeAnimFrame = requestAnimationFrame(tick);
+  }
+  tick();
+}
+
+function stopVolumeMonitor() {
+  if (volumeAnimFrame) { cancelAnimationFrame(volumeAnimFrame); volumeAnimFrame = null; }
+  if (audioContext)    { audioContext.close(); audioContext = null; }
+}
+
+function updateTimer(sec) {
+  const m = Math.floor(sec / 60);
+  const s = String(sec % 60).padStart(2, '0');
+  document.getElementById('timer-display').textContent = `${m}:${s}`;
+
+  // Ring progress
+  const frac    = Math.min(sec / CFG.max_duration_seconds, 1);
+  const offset  = CIRCUMFERENCE * (1 - frac);
+  document.getElementById('ring-progress').style.strokeDashoffset = offset;
+}
+
+/* ══════════════════════════════════════════════════════════════════════════
+   UPLOAD → POLL FLOW
+   ══════════════════════════════════════════════════════════════════════════ */
+async function handleRecordingDone() {
+  const wavBuffer  = encodeWav(mergeBuffers(pcmChunks), RECORD_SR);
+  const mimeType   = 'audio/wav';
+  const blob       = new Blob([wavBuffer], { type: mimeType });
+  const filename   = 'recording.wav';
+
+  goStep(3);
+  setProcessStep('ps-upload', 'active');
+
+  try {
+    // 1 — Get presigned upload URL
+    const urlResp = await fetch(`${API_BASE}/upload-url`, {
+      method:  'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body:    JSON.stringify({
+        filename,
+        mime_type:       mimeType,
+        file_size_bytes: blob.size,
+      }),
+    });
+
+    if (!urlResp.ok) {
+      const err = await urlResp.json().catch(() => ({}));
+      throw new Error(err.detail || t('err-generic'));
+    }
+
+    const { audio_id, upload_url } = await urlResp.json();
+
+    // 2 — Upload directly to S3
+    const putResp = await fetch(upload_url, {
+      method:  'PUT',
+      headers: { 'Content-Type': mimeType },
+      body:    blob,
+    });
+    if (!putResp.ok) throw new Error('S3 upload failed');
+
+    setProcessStep('ps-upload', 'done');
+    setProcessStep('ps-extract', 'active');
+
+    // 3 — Poll for result
+    const result = await pollResult(audio_id);
+
+    setProcessStep('ps-extract', 'done');
+    setProcessStep('ps-score', 'done');
+    setProcessStep('ps-result', 'active');
+
+    await sleep(400);
+    setProcessStep('ps-result', 'done');
+    await sleep(300);
+
+    renderResult(result);
+    goStep(4);
+
+  } catch (err) {
+    showError(err.message || t('err-generic'), null);
+  }
+}
+
+async function pollResult(audioId, maxAttempts = 30, intervalMs = 1000) {
+  for (let i = 0; i < maxAttempts; i++) {
+    await sleep(intervalMs);
+    // Gentle backoff after 5 attempts
+    if (i >= 5) intervalMs = Math.min(intervalMs * 1.3, 4000);
+
+    const r = await fetch(`${API_BASE}/result/${audioId}`);
+    if (!r.ok) continue;
+
+    const data = await r.json();
+
+    if (data.status === 'complete') return data.result;
+    if (data.status === 'failed')   throw new Error(data.error_message || t('err-generic'));
+    // pending | processing — keep polling
+  }
+  throw new Error(t('err-generic'));
+}
+
+/* ══════════════════════════════════════════════════════════════════════════
+   RESULT RENDERING
+   ══════════════════════════════════════════════════════════════════════════ */
+function renderResult(result) {
+  const score      = result.overall_health_score;
+  const risk       = result.pathology_risk.overall_risk;   // 'low'|'moderate'|'high'
+  const fp         = result.fundamental_parameters;
+  const amp        = result.amplitude_parameters;
+  const ci         = result.clinical_indicators;
+  const pr         = result.pathology_risk;
+
+  // Score arc
+  const arc    = document.getElementById('score-arc');
+  const frac   = score / 10;
+  const offset = 283 * (1 - frac);
+  const colour = score >= 7 ? '#4ade80' : score >= 5 ? '#fbbf24' : '#f87171';
+  arc.style.stroke            = colour;
+  arc.style.strokeDashoffset  = offset;
+
+  document.getElementById('score-val').textContent   = score.toFixed(1);
+  document.getElementById('score-val').style.color   = colour;
+
+  const badge = document.getElementById('score-badge');
+  badge.textContent  = t(`risk-${risk}`);
+  badge.className    = `score-badge badge-${risk}`;
+
+  // Message (uses current UI language)
+  document.getElementById('patient-msg').textContent =
+    lang === 'pt' ? result.patient_message_pt : result.patient_message_en;
+
+  // Recommendations
+  const recs = lang === 'pt' ? result.recommendations_pt : result.recommendations_en;
+  const recsList = document.getElementById('recs-list');
+  recsList.innerHTML = recs.map(r => `
+    <div class="rec-item">
+      <svg class="rec-icon" width="14" height="14" viewBox="0 0 24 24" fill="none"
+           stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
+        <polyline points="9 18 15 12 9 6"/>
+      </svg>
+      <span>${r}</span>
+    </div>
+  `).join('');
+
+  // Technical details grid
+  const statusClass = (s) => s === 'normal' ? 'ok' : s === 'elevated' ? 'bad' : 'warn';
+  const stabilityClass = ci.voice_stability === 'stable' ? 'ok' : 'bad';
+  const stabilityLabel = ci.voice_stability === 'stable'
+    ? (lang === 'pt' ? 'Estável' : 'Stable')
+    : (lang === 'pt' ? 'Instável' : 'Unstable');
+
+  const mptClass = ci.mpt_status === 'normal' ? 'ok' : ci.mpt_status === 'reduced' ? 'warn' : 'bad';
+  const mptLabel = t('mpt-' + (ci.mpt_status === 'normal' ? 'normal' : ci.mpt_status === 'reduced' ? 'borderline' : 'low'));
+
+  document.getElementById('details-grid').innerHTML = `
+    <div class="metric-card">
+      <div class="metric-label">${t('metric-f0')}</div>
+      <div class="metric-value">${fp.f0_mean_hz.toFixed(1)} Hz</div>
+    </div>
+    <div class="metric-card">
+      <div class="metric-label">${t('metric-mpt')}</div>
+      <div class="metric-value ${mptClass}">${ci.mpt_seconds.toFixed(1)}s — ${mptLabel}</div>
+    </div>
+    <div class="metric-card">
+      <div class="metric-label">${t('metric-jitter')}</div>
+      <div class="metric-value ${statusClass(pr.jitter_status)}">${fp.jitter_relative_pct.toFixed(2)}%</div>
+    </div>
+    <div class="metric-card">
+      <div class="metric-label">${t('metric-shimmer')}</div>
+      <div class="metric-value ${statusClass(pr.shimmer_status)}">${amp.shimmer_local_db.toFixed(2)} dB</div>
+    </div>
+    <div class="metric-card">
+      <div class="metric-label">${t('metric-hnr')}</div>
+      <div class="metric-value ${statusClass(pr.hnr_status)}">${ci.hnr_db.toFixed(1)} dB</div>
+    </div>
+    <div class="metric-card">
+      <div class="metric-label">${t('metric-voiced')}</div>
+      <div class="metric-value">${fp.voiced_fraction_pct.toFixed(1)}%</div>
+    </div>
+    <div class="metric-card">
+      <div class="metric-label">${t('metric-stability')}</div>
+      <div class="metric-value ${stabilityClass}">${stabilityLabel}</div>
+    </div>
+  `;
+}
+
+/* ══════════════════════════════════════════════════════════════════════════
+   HELPERS
+   ══════════════════════════════════════════════════════════════════════════ */
+function setProcessStep(id, state) {
+  const el = document.getElementById(id);
+  el.className = `proc-step${state === 'done' ? ' done' : state === 'active' ? ' active' : ''}`;
+}
+
+function toggleDetails() {
+  const grid   = document.getElementById('details-grid');
+  const toggle = document.getElementById('details-toggle');
+  const open   = grid.classList.toggle('open');
+  toggle.classList.toggle('open', open);
+}
+
+function showError(msg, _) {
+  goStep(4);
+  const body = document.querySelector('#step-4');
+  // Remove old error box if present
+  body.querySelector('.error-box')?.remove();
+  const box = document.createElement('div');
+  box.className   = 'error-box';
+  box.textContent = msg;
+  body.insertBefore(box, body.querySelector('.btn-primary'));
+  // Hide score display for error state
+  document.querySelector('.score-display').style.display  = 'none';
+  document.querySelector('.patient-msg').style.display    = 'none';
+  document.querySelector('#recs-list').style.display      = 'none';
+  document.querySelector('#details-toggle').style.display = 'none';
+}
+
+function restart() {
+  // Reset recording state
+  elapsedSec = 0;
+  pcmChunks = [];
+  updateTimer(0);
+  document.getElementById('ring-progress').style.strokeDashoffset = CIRCUMFERENCE;
+  document.getElementById('rec-status').textContent = t('s2-status-idle');
+
+  // Reset processing steps
+  ['ps-upload','ps-extract','ps-score','ps-result'].forEach(id =>
+    setProcessStep(id, ''));
+  setProcessStep('ps-upload', 'active');
+
+  // Reset result display
+  document.querySelector('.score-display').style.display  = '';
+  document.querySelector('.patient-msg').style.display    = '';
+  document.querySelector('#recs-list').style.display      = '';
+  document.querySelector('#details-toggle').style.display = '';
+  document.querySelector('.error-box')?.remove();
+  document.getElementById('details-grid').classList.remove('open');
+  document.getElementById('details-toggle').classList.remove('open');
+
+  goStep(1);
+}
+
+function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
+
+/* ══════════════════════════════════════════════════════════════════════════
+   WAV ENCODING — merges Float32 PCM chunks and writes a RIFF/WAV file
+   ══════════════════════════════════════════════════════════════════════════ */
+function mergeBuffers(chunks) {
+  const total  = chunks.reduce((n, c) => n + c.length, 0);
+  const merged = new Float32Array(total);
+  let offset = 0;
+  for (const chunk of chunks) { merged.set(chunk, offset); offset += chunk.length; }
+  return merged;
+}
+
+function encodeWav(samples, sampleRate) {
+  const numChannels  = 1;
+  const bitsPerSample = 16;
+  const byteRate     = sampleRate * numChannels * bitsPerSample / 8;
+  const blockAlign   = numChannels * bitsPerSample / 8;
+  const dataLen      = samples.length * 2;           // 2 bytes per Int16 sample
+  const buffer       = new ArrayBuffer(44 + dataLen);
+  const view         = new DataView(buffer);
+
+  // RIFF chunk
+  writeStr(view, 0,  'RIFF');
+  view.setUint32(4,  36 + dataLen, true);
+  writeStr(view, 8,  'WAVE');
+
+  // fmt sub-chunk
+  writeStr(view, 12, 'fmt ');
+  view.setUint32(16, 16, true);           // PCM chunk size
+  view.setUint16(20, 1,  true);           // PCM format
+  view.setUint16(22, numChannels, true);
+  view.setUint32(24, sampleRate,  true);
+  view.setUint32(28, byteRate,    true);
+  view.setUint16(32, blockAlign,  true);
+  view.setUint16(34, bitsPerSample, true);
+
+  // data sub-chunk
+  writeStr(view, 36, 'data');
+  view.setUint32(40, dataLen, true);
+  let pos = 44;
+  for (let i = 0; i < samples.length; i++, pos += 2) {
+    const s = Math.max(-1, Math.min(1, samples[i]));
+    view.setInt16(pos, s < 0 ? s * 0x8000 : s * 0x7FFF, true);
+  }
+  return buffer;
+}
+
+function writeStr(view, offset, str) {
+  for (let i = 0; i < str.length; i++) view.setUint8(offset + i, str.charCodeAt(i));
+}
+
+/* ══════════════════════════════════════════════════════════════════════════
+   INIT
+   ══════════════════════════════════════════════════════════════════════════ */
+(async () => {
+  await loadConfig();
+  setLang('pt');
+})();
+</script>
+</body>
+</html>

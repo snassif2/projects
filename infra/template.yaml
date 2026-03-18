@@ -1,0 +1,147 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: VozLab Voice Analysis — API Lambda + Analyzer Lambda + S3 + DynamoDB
+
+Parameters:
+  CorsOrigins:
+    Type: String
+    Default: '["*"]'
+    Description: 'JSON array of allowed CORS origins, e.g. ["https://yourdomain.com"]'
+
+Resources:
+
+  # ── Lambda Layer (parselmouth + numpy + soundfile) ────────────────────────
+  AudioProcessingLayer:
+    Type: AWS::Serverless::LayerVersion
+    Properties:
+      LayerName: vozlab-audio-processing
+      ContentUri: layer/
+      CompatibleRuntimes:
+        - python3.12
+      CompatibleArchitectures:
+        - x86_64
+    Metadata:
+      BuildMethod: python3.12
+
+  # ── DynamoDB results table (TTL 24h) ─────────────────────────────────────
+  ResultsTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: vozlab-results
+      BillingMode: PAY_PER_REQUEST
+      AttributeDefinitions:
+        - AttributeName: audio_id
+          AttributeType: S
+      KeySchema:
+        - AttributeName: audio_id
+          KeyType: HASH
+      TimeToLiveSpecification:
+        AttributeName: ttl
+        Enabled: true
+
+  # ── Analyzer Lambda (S3-triggered, runs parselmouth/Praat) ───────────────
+  # Defined BEFORE AudioBucket so the notification can reference its ARN.
+  # Policies use hardcoded bucket ARN to avoid circular dependency with AudioBucket.
+  AnalyzerFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: vozlab-analyzer
+      CodeUri: ../
+      Handler: analysis_handler.handler
+      Runtime: python3.12
+      Architectures: [x86_64]
+      MemorySize: 512
+      Timeout: 30
+      Layers:
+        - !Ref AudioProcessingLayer
+      Environment:
+        Variables:
+          VOZLAB_S3_BUCKET:      !Sub "vozlab-audio-intake-${AWS::AccountId}"
+          VOZLAB_DYNAMODB_TABLE: !Ref ResultsTable
+          VOZLAB_AWS_REGION:     !Ref AWS::Region
+          VOZLAB_CORS_ORIGINS:   !Ref CorsOrigins
+      Policies:
+        - Statement:
+          - Effect: Allow
+            Action: [s3:GetObject, s3:HeadObject]
+            Resource: !Sub "arn:aws:s3:::vozlab-audio-intake-${AWS::AccountId}/*"
+        - DynamoDBCrudPolicy:
+            TableName: !Ref ResultsTable
+
+  # Grants S3 permission to invoke the analyzer (must exist before bucket notification)
+  AnalyzerFunctionS3Permission:
+    Type: AWS::Lambda::Permission
+    Properties:
+      FunctionName: !GetAtt AnalyzerFunction.Arn
+      Action: lambda:InvokeFunction
+      Principal: s3.amazonaws.com
+      SourceArn: !Sub "arn:aws:s3:::vozlab-audio-intake-${AWS::AccountId}"
+
+  # ── S3 bucket (audio intake, 24h lifecycle) ──────────────────────────────
+  # DependsOn ensures the Lambda permission exists before the notification is registered.
+  AudioBucket:
+    Type: AWS::S3::Bucket
+    DependsOn: AnalyzerFunctionS3Permission
+    Properties:
+      BucketName: !Sub "vozlab-audio-intake-${AWS::AccountId}"
+      LifecycleConfiguration:
+        Rules:
+          - Id: DeleteAfter24h
+            Status: Enabled
+            ExpirationInDays: 1
+            Prefix: audio-intake/
+      CorsConfiguration:
+        CorsRules:
+          - AllowedMethods: [PUT]
+            AllowedOrigins: ['*']
+            AllowedHeaders: ['*']
+            MaxAge: 300
+      NotificationConfiguration:
+        LambdaConfigurations:
+          - Event: 's3:ObjectCreated:*'
+            Filter:
+              S3Key:
+                Rules:
+                  - Name: prefix
+                    Value: audio-intake/
+            Function: !GetAtt AnalyzerFunction.Arn
+
+  # ── API Lambda (presigned URL + result polling) ───────────────────────────
+  ApiFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: vozlab-api
+      CodeUri: ../
+      Handler: app.main.handler
+      Runtime: python3.12
+      Architectures: [x86_64]
+      MemorySize: 256
+      Timeout: 10
+      Layers:
+        - !Ref AudioProcessingLayer
+      Environment:
+        Variables:
+          VOZLAB_S3_BUCKET:      !Ref AudioBucket
+          VOZLAB_DYNAMODB_TABLE: !Ref ResultsTable
+          VOZLAB_AWS_REGION:     !Ref AWS::Region
+          VOZLAB_CORS_ORIGINS:   !Ref CorsOrigins
+      Policies:
+        - S3WritePolicy:
+            BucketName: !Ref AudioBucket
+        - DynamoDBCrudPolicy:
+            TableName: !Ref ResultsTable
+      Events:
+        ApiGateway:
+          Type: HttpApi
+          Properties:
+            Path: /{proxy+}
+            Method: ANY
+
+Outputs:
+  ApiEndpoint:
+    Description: API Gateway endpoint URL
+    Value: !Sub "https://${ServerlessHttpApi}.execute-api.${AWS::Region}.amazonaws.com"
+  AudioBucketName:
+    Value: !Ref AudioBucket
+  ResultsTableName:
+    Value: !Ref ResultsTable

@@ -1,0 +1,8 @@
+# Exclude heavy directories from Lambda function packages
+infra/
+tests/
+frontend/
+.aws-sam/
+requirements-dev.txt
+*.zip
+*.md

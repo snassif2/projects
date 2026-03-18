@@ -1,0 +1,32 @@
+# SAM build artifacts
+.aws-sam/
+infra/.aws-sam/
+
+# Lambda layer installed packages (rebuilt by SAM)
+infra/layer/python/
+
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+
+# Virtual environments
+.venv/
+venv/
+env/
+
+# Environment / secrets
+.env
+.env.*
+
+# Archives
+*.zip
+*.tar.gz
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db

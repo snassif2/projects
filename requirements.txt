@@ -1,0 +1,11 @@
+# Runtime dependencies for Lambda functions (app code only)
+# Heavy audio deps (parselmouth, numpy, soundfile) are in the Lambda Layer
+# boto3 is pre-installed in the Lambda python3.12 runtime — not bundled here
+fastapi==0.111.0
+mangum==0.17.0                  # FastAPI ↔ AWS Lambda + API Gateway adapter
+pydantic==2.7.1
+pydantic-settings==2.2.1
+uvicorn[standard]==0.29.0       # local dev only (not needed on Lambda)
+
+# HTTP transport (needed by multipart uploads)
+python-multipart==0.0.9

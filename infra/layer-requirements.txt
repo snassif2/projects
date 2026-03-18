@@ -1,0 +1,6 @@
+# Audio processing dependencies for Lambda Layer
+# parselmouth handles all feature extraction + resampling — no scipy/numba/LLVM needed
+# Estimated unzipped: ~65MB (parselmouth ~11MB + numpy ~50MB + soundfile ~1MB + cffi ~2MB)
+praat-parselmouth==0.4.7
+numpy==1.26.4
+soundfile==0.12.1
