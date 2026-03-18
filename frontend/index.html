@@ -533,13 +533,9 @@
 
       <div class="passage-card">
         <div class="passage-label">Leia em voz alta</div>
-        <p class="passage-text">
-          "Érica tomou suco de pêra e amora.<br>
-          Sônia sabe sambar sozinha.<br>
-          Olha lá o avião azul."
-        </p>
+        <p class="passage-text" id="passage-text"></p>
       </div>
-      <p class="passage-hint">Em ritmo natural, sem pressa. Toque para iniciar.</p>
+      <p class="passage-hint">Em ritmo natural, sem pressa. Toque para iniciar quando estiver pronto.</p>
 
       <div class="record-area">
         <div class="waveform-ring">
@@ -781,6 +777,7 @@ function stopRecording() {
     pcmChunks1    = pcmChunks;
     pcmChunks     = [];
     recordingPhase = 2;
+    showRandomPassage();
     goStep(3);
   } else {
     // Save phase 2, upload both and analyse
@@ -1096,6 +1093,68 @@ function restart() {
 }
 
 function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
+
+/* ══════════════════════════════════════════════════════════════════════════
+   PASSAGE POOL — 5 phonetically balanced PT-BR sets (~35–38 words each)
+   Covers: all oral/nasal vowels, voiced & voiceless fricatives,
+   nasals /m/ /n/ /ɲ/, liquids /l/ /r/, all plosives.
+   ══════════════════════════════════════════════════════════════════════════ */
+const PASSAGES = [
+  // A — CAPE-V estendido
+  [
+    "Érica tomou suco de pêra e amora.",
+    "Sônia sabe sambar sozinha.",
+    "Olha lá o avião azul.",
+    "Minha mãe namorou um homem muito gentil.",
+    "Papai trouxe pipoca quente para todos nós.",
+    "Vovó comeu banana com goiaba.",
+  ],
+  // B — Natureza
+  [
+    "O sol brilhava forte no céu azul da manhã.",
+    "As flores do jardim eram vermelhas e perfumadas.",
+    "O vento suave balançava os galhos das árvores.",
+    "Os pássaros cantavam alegres na tarde fria.",
+    "A lua cheia iluminava o caminho na noite calma.",
+  ],
+  // C — Cotidiano
+  [
+    "O menino brincava feliz no parque com seus amigos.",
+    "A menina cantava uma música bonita para a família.",
+    "O cachorro latia e corria pelo quintal molhado.",
+    "As crianças riram muito durante o jogo divertido.",
+    "O professor escreveu no quadro com giz branco.",
+  ],
+  // D — Culinária
+  [
+    "Hoje vou preparar uma sopa quente de legumes frescos.",
+    "O azeite dourado cheirava muito bem na frigideira.",
+    "As frutas coloridas estavam sobre a mesa da cozinha.",
+    "O bolo de chocolate ficou muito gostoso e fofo.",
+    "A família jantou junta com alegria e satisfação.",
+  ],
+  // E — Cidade
+  [
+    "O vizinho simpático sorria ao passar pela rua larga.",
+    "As crianças brincavam na praça da cidade velha.",
+    "A tarde estava nublada e o vento era bem frio.",
+    "Os carros passavam devagar sob a chuva fina.",
+    "As lojas fechavam cedo no inverno rigoroso.",
+  ],
+];
+
+let lastPassageIdx = -1;
+
+function showRandomPassage() {
+  let idx;
+  do { idx = Math.floor(Math.random() * PASSAGES.length); }
+  while (idx === lastPassageIdx && PASSAGES.length > 1);
+  lastPassageIdx = idx;
+
+  const sentences = PASSAGES[idx];
+  document.getElementById('passage-text').innerHTML =
+    sentences.map(s => `"${s}"`).join('<br>');
+}
 
 /* ══════════════════════════════════════════════════════════════════════════
    INIT
