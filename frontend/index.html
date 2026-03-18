@@ -437,11 +437,11 @@
 
     <!-- ── Step 1: Instructions ──────────────────────────────────────── -->
     <div class="step active" id="step-1">
-      <h2 class="step-title">Avalie sua voz em dois testes</h2>
+      <h2 class="step-title">Avalie sua voz em três testes</h2>
 
       <div class="duration-badge">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-        <span id="badge-duration">2 testes · ~30 segundos no total</span>
+        <span id="badge-duration">3 testes · ~50 segundos no total</span>
       </div>
 
       <ul class="instruction-list">
@@ -451,7 +451,7 @@
         </li>
         <li>
           <span class="num">2</span>
-          <span><strong>Teste 1 — Fonação:</strong> inspire fundo e diga <strong>"Aaaah"</strong> em tom constante e confortável até acabar o fôlego (máx. 15 s).</span>
+          <span><strong>Teste 1 — Fonação:</strong> inspire fundo e diga <strong>"Aaaah"</strong> em tom constante até acabar o fôlego (máx. 15 s).</span>
         </li>
         <li>
           <span class="num">3</span>
@@ -459,7 +459,7 @@
         </li>
         <li>
           <span class="num">4</span>
-          <span>Mínimo de 5 s em cada teste para análise confiável.</span>
+          <span><strong>Teste 3 — Diadococinesia:</strong> repita <strong>/pa-ta-ka/</strong> o mais rápido possível, sem parar, por até 10 s.</span>
         </li>
       </ul>
 
@@ -476,7 +476,8 @@
 
       <div class="step-progress">
         <span class="step-dot active"></span>
-        <span class="step-dot-label" style="font-size:.7rem;color:var(--ink-muted)">Teste 1 de 2</span>
+        <span class="step-dot-label" style="font-size:.7rem;color:var(--ink-muted)">Teste 1 de 3</span>
+        <span class="step-dot"></span>
         <span class="step-dot"></span>
       </div>
 
@@ -525,8 +526,9 @@
 
       <div class="step-progress">
         <span class="step-dot done"></span>
-        <span class="step-dot-label" style="font-size:.7rem;color:var(--ink-muted)">Teste 2 de 2</span>
+        <span class="step-dot-label" style="font-size:.7rem;color:var(--ink-muted)">Teste 2 de 3</span>
         <span class="step-dot active"></span>
+        <span class="step-dot"></span>
       </div>
 
       <h2 class="step-title">Fala contínua</h2>
@@ -570,8 +572,59 @@
       </div>
     </div>
 
-    <!-- ── Step 4: Processing ────────────────────────────────────────── -->
+    <!-- ── Step 4: Diadococinesia ────────────────────────────────────── -->
     <div class="step" id="step-4">
+
+      <div class="step-progress">
+        <span class="step-dot done"></span>
+        <span class="step-dot done"></span>
+        <span class="step-dot-label" style="font-size:.7rem;color:var(--ink-muted)">Teste 3 de 3</span>
+        <span class="step-dot active"></span>
+      </div>
+
+      <h2 class="step-title">Diadococinesia</h2>
+
+      <div class="passage-card">
+        <div class="passage-label">Repita o mais rápido possível</div>
+        <p class="passage-text">pa-ta-ka &nbsp; pa-ta-ka &nbsp; pa-ta-ka</p>
+      </div>
+      <p class="passage-hint">Sem parar, em ritmo constante, pelo tempo máximo de 10 s. Toque para iniciar quando estiver pronto.</p>
+
+      <div class="record-area">
+        <div class="waveform-ring">
+          <svg viewBox="0 0 120 120">
+            <circle class="ring-track" cx="60" cy="60" r="54" />
+            <circle class="ring-progress" id="ring-progress-3" cx="60" cy="60" r="54" />
+          </svg>
+          <div class="ring-inner">
+            <span class="ring-timer" id="timer-display-3">0:00</span>
+            <span class="ring-label" id="timer-label-3">pronto</span>
+          </div>
+        </div>
+
+        <button class="record-btn" id="record-btn-3" onclick="toggleRecording()">
+          <svg id="icon-mic-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/>
+            <path d="M19 10v2a7 7 0 0 1-14 0v-2"/>
+            <line x1="12" y1="19" x2="12" y2="23"/>
+            <line x1="8" y1="23" x2="16" y2="23"/>
+          </svg>
+          <svg id="icon-stop-3" viewBox="0 0 24 24" fill="currentColor" style="display:none">
+            <rect x="4" y="4" width="16" height="16" rx="2"/>
+          </svg>
+        </button>
+
+        <p class="rec-status" id="rec-status-3">Toque para iniciar gravação</p>
+
+        <div class="volume-bar-wrap" id="volume-wrap-3" style="display:none">
+          <div class="volume-track"><div class="volume-fill" id="volume-fill-3"></div></div>
+          <span class="volume-label" id="volume-label-3"></span>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── Step 5: Processing ────────────────────────────────────────── -->
+    <div class="step" id="step-5">
       <div class="processing-area">
         <div class="spinner"></div>
         <p style="font-size:.9rem; color:var(--ink-muted)">Analisando sua voz…</p>
@@ -592,8 +645,8 @@
       </div>
     </div>
 
-    <!-- ── Step 5: Results ───────────────────────────────────────────── -->
-    <div class="step" id="step-5">
+    <!-- ── Step 6: Results ───────────────────────────────────────────── -->
+    <div class="step" id="step-6">
 
       <div class="scores-row">
         <!-- Panel 1: Fonação -->
@@ -631,6 +684,13 @@
 
       <p class="patient-msg" id="patient-msg"></p>
 
+      <!-- DDK panel — only shown when ddk_analysis is present -->
+      <div id="ddk-panel" style="display:none; margin-bottom:20px;">
+        <div class="details-section-label" style="margin-bottom:8px;">Diadococinesia (pa-ta-ka)</div>
+        <div class="details-grid" id="ddk-grid"></div>
+        <p id="ddk-msg" style="font-size:.83rem;color:var(--ink-muted);margin-top:8px;line-height:1.5;"></p>
+      </div>
+
       <div class="recommendations" id="recs-list"></div>
 
       <button class="details-toggle" id="details-toggle" onclick="toggleDetails()">
@@ -642,6 +702,10 @@
         <div class="details-grid" id="details-grid-1"></div>
         <div class="details-section-label">Fala Contínua</div>
         <div class="details-grid" id="details-grid-2"></div>
+        <div id="details-ddk-section" style="display:none">
+          <div class="details-section-label">Diadococinesia</div>
+          <div class="details-grid" id="details-grid-3"></div>
+        </div>
       </div>
 
       <button class="btn btn-primary" onclick="restart()">Nova triagem</button>
@@ -680,10 +744,11 @@ function goStep(n) {
 /* ══════════════════════════════════════════════════════════════════════════
    RECORDING STATE
    ══════════════════════════════════════════════════════════════════════════ */
-let recordingPhase = 1;   // 1 = Ahhh, 2 = CAPE-V
+let recordingPhase = 1;   // 1 = Ahhh, 2 = CAPE-V, 3 = DDK
 let pcmChunks      = [];  // current recording chunks
 let pcmChunks1     = [];  // saved after phase 1
 let pcmChunks2     = [];  // saved after phase 2
+let pcmChunks3     = [];  // saved after phase 3 (DDK)
 
 let recordStream   = null;
 let scriptNode     = null;
@@ -747,7 +812,7 @@ async function startRecording() {
     timerInterval = setInterval(() => {
       elapsedSec++;
       updateTimer(elapsedSec);
-      if (elapsedSec >= CFG.max_duration_seconds) stopRecording();
+      if (elapsedSec >= getMaxDuration()) stopRecording();
     }, 1000);
 
   } catch (err) {
@@ -774,14 +839,20 @@ function stopRecording() {
 
   if (recordingPhase === 1) {
     // Save phase 1, advance to CAPE-V step
-    pcmChunks1    = pcmChunks;
-    pcmChunks     = [];
+    pcmChunks1     = pcmChunks;
+    pcmChunks      = [];
     recordingPhase = 2;
     showRandomPassage();
     goStep(3);
+  } else if (recordingPhase === 2) {
+    // Save phase 2, advance to DDK step
+    pcmChunks2     = pcmChunks;
+    pcmChunks      = [];
+    recordingPhase = 3;
+    goStep(4);
   } else {
-    // Save phase 2, upload both and analyse
-    pcmChunks2 = pcmChunks;
+    // Save phase 3 (DDK), upload all three and analyse
+    pcmChunks3 = pcmChunks;
     pcmChunks  = [];
     handleRecordingsDone();
   }
@@ -821,11 +892,15 @@ function stopVolumeMonitor() {
   if (audioContext)    { audioContext.close(); audioContext = null; }
 }
 
+function getMaxDuration() {
+  return recordingPhase === 3 ? 10 : CFG.max_duration_seconds;
+}
+
 function updateTimer(sec) {
   const m = Math.floor(sec / 60);
   const s = String(sec % 60).padStart(2, '0');
   p('timer-display').textContent = `${m}:${s}`;
-  const offset = CIRCUMFERENCE * (1 - Math.min(sec / CFG.max_duration_seconds, 1));
+  const offset = CIRCUMFERENCE * (1 - Math.min(sec / getMaxDuration(), 1));
   p('ring-progress').style.strokeDashoffset = offset;
 }
 
@@ -835,13 +910,14 @@ function updateTimer(sec) {
 async function handleRecordingsDone() {
   const blob1 = new Blob([encodeWav(mergeBuffers(pcmChunks1), RECORD_SR)], { type: 'audio/wav' });
   const blob2 = new Blob([encodeWav(mergeBuffers(pcmChunks2), RECORD_SR)], { type: 'audio/wav' });
+  const blob3 = new Blob([encodeWav(mergeBuffers(pcmChunks3), RECORD_SR)], { type: 'audio/wav' });
 
-  goStep(4);
+  goStep(5);
   setProcessStep('ps-upload', 'active');
 
   try {
-    // 1 — Get both presigned URLs
-    const [resp1, resp2] = await Promise.all([
+    // 1 — Get all three presigned URLs
+    const [resp1, resp2, resp3] = await Promise.all([
       fetch(`${API_BASE}/upload-url`, {
         method: 'POST', headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ filename: 'phonation.wav', mime_type: 'audio/wav', file_size_bytes: blob1.size }),
@@ -850,23 +926,29 @@ async function handleRecordingsDone() {
         method: 'POST', headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ filename: 'speech.wav', mime_type: 'audio/wav', file_size_bytes: blob2.size }),
       }),
+      fetch(`${API_BASE}/upload-url`, {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ filename: 'ddk.wav', mime_type: 'audio/wav', file_size_bytes: blob3.size, recording_type: 'ddk' }),
+      }),
     ]);
-    if (!resp1.ok || !resp2.ok) throw new Error('Não foi possível obter URL de upload.');
+    if (!resp1.ok || !resp2.ok || !resp3.ok) throw new Error('Não foi possível obter URL de upload.');
     const { audio_id: id1, upload_url: url1 } = await resp1.json();
     const { audio_id: id2, upload_url: url2 } = await resp2.json();
+    const { audio_id: id3, upload_url: url3 } = await resp3.json();
 
-    // 2 — Upload both to S3
-    const [put1, put2] = await Promise.all([
+    // 2 — Upload all three to S3
+    const [put1, put2, put3] = await Promise.all([
       fetch(url1, { method: 'PUT', headers: { 'Content-Type': 'audio/wav' }, body: blob1 }),
       fetch(url2, { method: 'PUT', headers: { 'Content-Type': 'audio/wav' }, body: blob2 }),
+      fetch(url3, { method: 'PUT', headers: { 'Content-Type': 'audio/wav' }, body: blob3 }),
     ]);
-    if (!put1.ok || !put2.ok) throw new Error('Falha no envio do áudio.');
+    if (!put1.ok || !put2.ok || !put3.ok) throw new Error('Falha no envio do áudio.');
 
     setProcessStep('ps-upload', 'done');
     setProcessStep('ps-extract', 'active');
 
-    // 3 — Poll both in parallel
-    const [result1, result2] = await Promise.all([pollResult(id1), pollResult(id2)]);
+    // 3 — Poll all three in parallel
+    const [result1, result2, result3] = await Promise.all([pollResult(id1), pollResult(id2), pollResult(id3)]);
 
     setProcessStep('ps-extract', 'done');
     setProcessStep('ps-score', 'done');
@@ -875,8 +957,8 @@ async function handleRecordingsDone() {
     setProcessStep('ps-result', 'done');
     await sleep(300);
 
-    renderResults(result1, result2);
-    goStep(5);
+    renderResults(result1, result2, result3);
+    goStep(6);
 
   } catch (err) {
     showError(err.message || 'Não foi possível analisar o áudio. Tente novamente.');
@@ -899,20 +981,34 @@ async function pollResult(audioId, maxAttempts = 30, intervalMs = 1000) {
 /* ══════════════════════════════════════════════════════════════════════════
    RESULT RENDERING
    ══════════════════════════════════════════════════════════════════════════ */
-function renderResults(r1, r2) {
+function renderResults(r1, r2, r3) {
   renderScorePanel(1, r1);
   renderScorePanel(2, r2);
 
-  // Patient message: use the more severe result
+  // Patient message: use the more severe phonation/speech result
   const riskOrder = { low: 0, moderate: 1, high: 2 };
   const worst = riskOrder[r2.pathology_risk.overall_risk] >= riskOrder[r1.pathology_risk.overall_risk] ? r2 : r1;
   document.getElementById('patient-msg').textContent = worst.patient_message_pt;
 
-  // Recommendations: merge both, deduplicate (disclaimer appears in both)
+  // DDK panel
+  const ddk = r3 && r3.ddk_analysis;
+  if (ddk) {
+    renderDDKPanel(ddk);
+    document.getElementById('ddk-panel').style.display = '';
+    document.getElementById('details-ddk-section').style.display = '';
+    renderDDKDetailGrid('details-grid-3', ddk);
+  }
+
+  // Recommendations: merge phonation + speech, deduplicate; append DDK recs after
   const combined = [...r1.recommendations_pt];
   r2.recommendations_pt.forEach(rec => {
     if (!combined.includes(rec)) combined.push(rec);
   });
+  if (ddk) {
+    ddk.recommendations_pt.forEach(rec => {
+      if (!combined.includes(rec)) combined.push(rec);
+    });
+  }
 
   document.getElementById('recs-list').innerHTML = combined.map(rec => `
     <div class="rec-item">
@@ -988,6 +1084,60 @@ function renderDetailGrid(gridId, result) {
   `;
 }
 
+function renderDDKPanel(ddk) {
+  const statusLabels = { normal: 'Normal', slow: 'Lento', irregular: 'Irregular' };
+  const statusClasses = { normal: 'ok', slow: 'warn', irregular: 'bad' };
+  const cls = statusClasses[ddk.ddk_status] || 'warn';
+
+  document.getElementById('ddk-grid').innerHTML = `
+    <div class="metric-card">
+      <div class="metric-label">Taxa de sílabas</div>
+      <div class="metric-value ${cls}">${ddk.syllable_rate_hz.toFixed(1)} síl/s</div>
+    </div>
+    <div class="metric-card">
+      <div class="metric-label">Taxa de tríades</div>
+      <div class="metric-value">${ddk.triad_rate_hz.toFixed(2)} pa-ta-ka/s</div>
+    </div>
+    <div class="metric-card">
+      <div class="metric-label">Regularidade (CV)</div>
+      <div class="metric-value ${ddk.regularity_status === 'normal' ? 'ok' : 'bad'}">${ddk.regularity_cv_pct.toFixed(0)}%</div>
+    </div>
+    <div class="metric-card">
+      <div class="metric-label">Status</div>
+      <div class="metric-value ${cls}">${statusLabels[ddk.ddk_status] || ddk.ddk_status}</div>
+    </div>
+  `;
+  document.getElementById('ddk-msg').textContent = ddk.patient_message_pt;
+}
+
+function renderDDKDetailGrid(gridId, ddk) {
+  const statusLabels = { normal: 'Normal', slow: 'Lento', irregular: 'Irregular' };
+  const statusClasses = { normal: 'ok', slow: 'warn', irregular: 'bad' };
+  const cls = statusClasses[ddk.ddk_status] || 'warn';
+  document.getElementById(gridId).innerHTML = `
+    <div class="metric-card">
+      <div class="metric-label">Taxa de sílabas</div>
+      <div class="metric-value ${cls}">${ddk.syllable_rate_hz.toFixed(1)} síl/s</div>
+    </div>
+    <div class="metric-card">
+      <div class="metric-label">Sílabas detectadas</div>
+      <div class="metric-value">${ddk.syllable_count}</div>
+    </div>
+    <div class="metric-card">
+      <div class="metric-label">Tríades (pa-ta-ka/s)</div>
+      <div class="metric-value">${ddk.triad_rate_hz.toFixed(2)}</div>
+    </div>
+    <div class="metric-card">
+      <div class="metric-label">Variabilidade CV</div>
+      <div class="metric-value ${ddk.regularity_status === 'normal' ? 'ok' : 'bad'}">${ddk.regularity_cv_pct.toFixed(0)}%</div>
+    </div>
+    <div class="metric-card">
+      <div class="metric-label">Status DDK</div>
+      <div class="metric-value ${cls}">${statusLabels[ddk.ddk_status] || ddk.ddk_status}</div>
+    </div>
+  `;
+}
+
 /* ══════════════════════════════════════════════════════════════════════════
    WAV ENCODING
    ══════════════════════════════════════════════════════════════════════════ */
@@ -1044,8 +1194,8 @@ function toggleDetails() {
 }
 
 function showError(msg) {
-  goStep(5);
-  const body = document.querySelector('#step-5');
+  goStep(6);
+  const body = document.querySelector('#step-6');
   body.querySelector('.error-box')?.remove();
   const box = document.createElement('div');
   box.className   = 'error-box';
@@ -1055,16 +1205,17 @@ function showError(msg) {
   document.querySelector('.patient-msg').style.display  = 'none';
   document.querySelector('#recs-list').style.display    = 'none';
   document.querySelector('#details-toggle').style.display = 'none';
+  document.getElementById('ddk-panel').style.display    = 'none';
 }
 
 function restart() {
   // Reset recording state
   recordingPhase = 1;
-  pcmChunks = []; pcmChunks1 = []; pcmChunks2 = [];
+  pcmChunks = []; pcmChunks1 = []; pcmChunks2 = []; pcmChunks3 = [];
   elapsedSec = 0;
 
-  // Reset both recording UIs
-  [1, 2].forEach(n => {
+  // Reset all three recording UIs
+  [1, 2, 3].forEach(n => {
     document.getElementById(`ring-progress-${n}`).style.strokeDashoffset = CIRCUMFERENCE;
     document.getElementById(`timer-display-${n}`).textContent = '0:00';
     document.getElementById(`timer-label-${n}`).textContent   = 'pronto';
@@ -1085,6 +1236,8 @@ function restart() {
   document.querySelector('.patient-msg').style.display   = '';
   document.querySelector('#recs-list').style.display     = '';
   document.querySelector('#details-toggle').style.display = '';
+  document.getElementById('ddk-panel').style.display     = 'none';
+  document.getElementById('details-ddk-section').style.display = 'none';
   document.querySelector('.error-box')?.remove();
   document.getElementById('details-wrap').classList.remove('open');
   document.getElementById('details-toggle').classList.remove('open');

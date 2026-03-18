@@ -55,9 +55,11 @@ def request_upload_url(
     audio_id = str(uuid.uuid4())
 
     # Derive a safe S3 key from the original filename extension
+    # DDK recordings get a -ddk suffix so the analyzer can branch on type
     from pathlib import Path
-    original_ext = Path(body.filename).suffix or ".webm"
-    s3_key = f"audio-intake/{audio_id}{original_ext}"
+    original_ext = Path(body.filename).suffix or ".wav"
+    ddk_suffix   = "-ddk" if body.recording_type == "ddk" else ""
+    s3_key = f"audio-intake/{audio_id}{ddk_suffix}{original_ext}"
 
     # Generate presigned PUT URL
     s3_client = boto3.client("s3", region_name=settings.aws_region)

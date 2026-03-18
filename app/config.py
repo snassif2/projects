@@ -86,6 +86,14 @@ class Settings(BaseSettings):
             raise ValueError("Score weights must be non-negative")
         return float(v)
 
+    # ── DDK (Diadochokinesis) norms ───────────────────────────────────────────
+    # /pa-ta-ka/ repeated as fast as possible for ~10s
+    # Normal range: 4.0–7.0 syllables/sec (= 1.33–2.33 triads/sec)
+    ddk_normal_min_rate_hz: float = 4.0   # syllables/sec — below this = SLOW
+    ddk_normal_max_rate_hz: float = 7.0   # syllables/sec — above this = rarely seen
+    ddk_normal_max_cv_pct:  float = 20.0  # irregularity threshold (CV%)
+    ddk_max_duration_seconds: int = 10    # recording cap for DDK step
+
     # ── Locale ────────────────────────────────────────────────────────────────
     default_locale: str = "pt-BR"    # "pt-BR" | "en"
 

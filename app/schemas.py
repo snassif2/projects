@@ -42,6 +42,11 @@ class ActionRequired(str, Enum):
     CONSULT = "consult"
     URGENT = "urgent"
 
+class DDKStatus(str, Enum):
+    NORMAL    = "normal"
+    SLOW      = "slow"       # rate below normal range
+    IRREGULAR = "irregular"  # CV above threshold
+
 
 # ── Sub-models ────────────────────────────────────────────────────────────────
 
@@ -85,6 +90,18 @@ class PathologyRisk(BaseModel):
     hnr_status: ParameterStatus
 
 
+class DDKAnalysis(BaseModel):
+    """Populated only when recording_type == 'ddk'."""
+    syllable_rate_hz:   float = Field(ge=0, description="Detected syllables per second")
+    triad_rate_hz:      float = Field(ge=0, description="pa-ta-ka triads per second (rate / 3)")
+    syllable_count:     int   = Field(ge=0, description="Total syllable peaks detected")
+    regularity_cv_pct:  float = Field(ge=0, description="CV of inter-peak intervals (%)")
+    ddk_status:         DDKStatus
+    regularity_status:  ParameterStatus   # normal / reduced(borderline) / elevated(irregular)
+    patient_message_pt: str
+    recommendations_pt: list[str]
+
+
 # ── Top-level result ──────────────────────────────────────────────────────────
 
 class VoiceAnalysisResult(BaseModel):
@@ -114,6 +131,10 @@ class VoiceAnalysisResult(BaseModel):
     recommendations_pt: list[str]
     patient_message_pt: str
 
+    # DDK — only populated when recording_type == "ddk"
+    recording_type: str = "phonation"   # "phonation" | "speech" | "ddk"
+    ddk_analysis: DDKAnalysis | None = None
+
 
 # ── API request / response wrappers ──────────────────────────────────────────
 
@@ -122,6 +143,7 @@ class UploadUrlRequest(BaseModel):
     filename: str = Field(description="Original filename from the browser")
     mime_type: str = Field(description="MIME type the browser will use to upload")
     file_size_bytes: int = Field(gt=0)
+    recording_type: str = Field(default="phonation", description="phonation | speech | ddk")
 
 
 class UploadUrlResponse(BaseModel):
