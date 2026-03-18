@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>VozLab — Triagem Vocal / Voice Screening</title>
+  <title>VozLab — Triagem Vocal</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet" />
   <style>
@@ -66,27 +66,29 @@
     }
     .brand-sub { font-size: .8rem; color: var(--ink-muted); font-weight: 300; }
 
-    .lang-toggle {
-      display: flex;
-      gap: 4px;
-      background: var(--bg);
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      padding: 3px;
-      flex-shrink: 0;
-    }
-    .lang-btn {
-      background: none; border: none; cursor: pointer;
-      font-size: .75rem; font-weight: 600; color: var(--ink-muted);
-      padding: 4px 10px; border-radius: 5px; transition: all .15s;
-    }
-    .lang-btn.active { background: var(--teal-dim); color: var(--teal); }
-
     .card-body { padding: 28px 32px; }
 
     /* ── Steps ─────────────────────────────────────────────────────────── */
     .step { display: none; }
     .step.active { display: block; }
+
+    /* ── Step progress dots ─────────────────────────────────────────────── */
+    .step-progress {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 22px;
+    }
+    .step-dot {
+      width: 7px; height: 7px;
+      border-radius: 50%;
+      background: var(--border);
+      transition: background .3s;
+    }
+    .step-dot.active { background: var(--teal); }
+    .step-dot.done   { background: var(--teal-dim); border: 1px solid var(--teal); }
+    .step-dot-label  { font-size: .68rem; color: var(--ink-muted); }
 
     /* ── Step 1 — Instructions ─────────────────────────────────────────── */
     .step-title {
@@ -151,10 +153,7 @@
       font-family: inherit; font-size: .95rem; font-weight: 600;
       cursor: pointer; transition: all .2s; letter-spacing: .01em;
     }
-    .btn-primary {
-      background: var(--teal);
-      color: #0d1117;
-    }
+    .btn-primary { background: var(--teal); color: #0d1117; }
     .btn-primary:hover { filter: brightness(1.1); transform: translateY(-1px); }
     .btn-primary:disabled { opacity: .4; cursor: not-allowed; transform: none; }
     .btn-secondary {
@@ -165,7 +164,7 @@
     }
     .btn-secondary:hover { border-color: var(--ink-muted); color: var(--ink); }
 
-    /* ── Step 2 — Recording ────────────────────────────────────────────── */
+    /* ── Recording step ─────────────────────────────────────────────────── */
     .record-area {
       display: flex;
       flex-direction: column;
@@ -183,35 +182,29 @@
     .ring-progress {
       fill: none; stroke: var(--teal); stroke-width: 4;
       stroke-linecap: round;
-      stroke-dasharray: 339.3;   /* 2π × 54 */
+      stroke-dasharray: 339.3;
       stroke-dashoffset: 339.3;
       transform: rotate(-90deg);
       transform-origin: center;
       transition: stroke-dashoffset .5s linear;
     }
     .ring-inner {
-      position: absolute;
-      inset: 14px;
+      position: absolute; inset: 14px;
       background: var(--bg);
       border-radius: 50%;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
       gap: 2px;
     }
     .ring-timer {
       font-family: 'DM Serif Display', serif;
-      font-size: 1.5rem;
-      color: var(--ink);
-      line-height: 1;
+      font-size: 1.5rem; color: var(--ink); line-height: 1;
     }
     .ring-label { font-size: .65rem; color: var(--ink-muted); text-transform: uppercase; letter-spacing: .08em; }
 
     .record-btn {
       width: 64px; height: 64px;
-      border-radius: 50%;
-      border: none; cursor: pointer;
+      border-radius: 50%; border: none; cursor: pointer;
       background: var(--teal);
       display: grid; place-items: center;
       transition: all .2s;
@@ -223,26 +216,44 @@
     }
     @keyframes pulse {
       0%, 100% { box-shadow: 0 0 0 0 rgba(248,113,113,.4); }
-      50%        { box-shadow: 0 0 0 14px rgba(248,113,113,.0); }
+      50%       { box-shadow: 0 0 0 14px rgba(248,113,113,.0); }
     }
     .record-btn svg { width: 22px; height: 22px; }
 
     .rec-status {
-      font-size: .85rem;
-      color: var(--ink-muted);
-      text-align: center;
-      min-height: 20px;
+      font-size: .85rem; color: var(--ink-muted);
+      text-align: center; min-height: 20px;
     }
     .rec-status.live { color: var(--red); font-weight: 500; }
 
+    /* ── Passage card ───────────────────────────────────────────────────── */
+    .passage-card {
+      background: rgba(45,212,191,.05);
+      border: 1px solid var(--teal-dim);
+      border-radius: 10px;
+      padding: 18px 20px;
+      margin-bottom: 8px;
+    }
+    .passage-label {
+      font-size: .68rem; font-weight: 600;
+      color: var(--teal); text-transform: uppercase;
+      letter-spacing: .08em; margin-bottom: 10px;
+    }
+    .passage-text {
+      font-size: 1.05rem; color: var(--ink);
+      line-height: 1.65; font-style: italic;
+      text-align: center;
+    }
+    .passage-hint {
+      font-size: .78rem; color: var(--ink-muted);
+      text-align: center; margin-bottom: 20px; line-height: 1.5;
+    }
+
     /* ── Step 3 — Processing ───────────────────────────────────────────── */
     .processing-area {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 20px;
-      padding: 16px 0;
-      text-align: center;
+      display: flex; flex-direction: column;
+      align-items: center; gap: 20px;
+      padding: 16px 0; text-align: center;
     }
     .spinner {
       width: 48px; height: 48px;
@@ -256,48 +267,59 @@
     .proc-step {
       display: flex; align-items: center; gap: 10px;
       font-size: .83rem; color: var(--ink-muted);
-      padding: 8px 12px;
-      border-radius: 8px;
-      background: rgba(255,255,255,.02);
-      transition: all .3s;
+      padding: 8px 12px; border-radius: 8px;
+      background: rgba(255,255,255,.02); transition: all .3s;
     }
-    .proc-step.done { color: var(--teal); background: rgba(45,212,191,.06); }
-    .proc-step.active { color: var(--ink); background: rgba(255,255,255,.04); }
-    .proc-dot {
-      width: 8px; height: 8px; border-radius: 50%; background: var(--border); flex-shrink: 0;
-    }
-    .proc-step.done .proc-dot { background: var(--teal); }
+    .proc-step.done   { color: var(--teal); background: rgba(45,212,191,.06); }
+    .proc-step.active { color: var(--ink);  background: rgba(255,255,255,.04); }
+    .proc-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--border); flex-shrink: 0; }
+    .proc-step.done   .proc-dot { background: var(--teal); }
     .proc-step.active .proc-dot { background: var(--amber); animation: blink .9s ease-in-out infinite; }
     @keyframes blink { 0%,100%{opacity:1} 50%{opacity:.3} }
 
-    /* ── Step 4 — Results ──────────────────────────────────────────────── */
-    .score-display {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 8px;
-      padding: 24px 0 20px;
+    /* ── Step 5 — Results ──────────────────────────────────────────────── */
+
+    /* Two score panels */
+    .scores-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-bottom: 20px;
     }
-    .score-ring { position: relative; width: 110px; height: 110px; }
+    .score-panel {
+      background: rgba(255,255,255,.02);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 16px 10px;
+      display: flex; flex-direction: column;
+      align-items: center; gap: 8px;
+    }
+    .panel-label {
+      font-size: .68rem; font-weight: 600;
+      color: var(--ink-muted); text-transform: uppercase;
+      letter-spacing: .06em; text-align: center;
+    }
+    .score-ring { position: relative; width: 90px; height: 90px; }
     .score-ring svg { width: 100%; height: 100%; }
-    .score-bg { fill: none; stroke: var(--border); stroke-width: 6; }
+    .score-bg   { fill: none; stroke: var(--border); stroke-width: 6; }
     .score-fill {
       fill: none; stroke-width: 6; stroke-linecap: round;
-      stroke-dasharray: 283; /* 2π × 45 */
+      stroke-dasharray: 283;
       stroke-dashoffset: 283;
       transform: rotate(-90deg); transform-origin: center;
       transition: stroke-dashoffset 1.2s cubic-bezier(.4,0,.2,1), stroke .4s;
     }
     .score-number {
       position: absolute; inset: 0;
-      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
     }
-    .score-val { font-family: 'DM Serif Display', serif; font-size: 1.8rem; line-height: 1; }
-    .score-max { font-size: .7rem; color: var(--ink-muted); }
+    .score-val { font-family: 'DM Serif Display', serif; font-size: 1.5rem; line-height: 1; }
+    .score-max { font-size: .65rem; color: var(--ink-muted); }
     .score-badge {
       display: inline-block;
-      font-size: .75rem; font-weight: 600;
-      padding: 4px 12px; border-radius: 20px;
+      font-size: .68rem; font-weight: 600;
+      padding: 3px 10px; border-radius: 20px;
       text-transform: uppercase; letter-spacing: .06em;
     }
     .badge-low      { background: rgba(74,222,128,.12); color: var(--green); }
@@ -305,13 +327,11 @@
     .badge-high     { background: rgba(248,113,113,.12); color: var(--red);   }
 
     .patient-msg {
-      font-size: .92rem; color: var(--ink); text-align: center;
-      line-height: 1.55; margin-bottom: 20px;
+      font-size: .92rem; color: var(--ink);
+      text-align: center; line-height: 1.55; margin-bottom: 20px;
     }
 
-    .recommendations {
-      display: flex; flex-direction: column; gap: 8px; margin-bottom: 20px;
-    }
+    .recommendations { display: flex; flex-direction: column; gap: 8px; margin-bottom: 20px; }
     .rec-item {
       display: flex; align-items: flex-start; gap: 10px;
       font-size: .83rem; color: var(--ink-muted); line-height: 1.5;
@@ -333,18 +353,23 @@
     .details-toggle .chevron { transition: transform .2s; }
     .details-toggle.open .chevron { transform: rotate(180deg); }
 
+    .details-wrap { display: none; margin-bottom: 20px; }
+    .details-wrap.open { display: block; }
+    .details-section-label {
+      font-size: .68rem; font-weight: 600;
+      color: var(--teal); text-transform: uppercase;
+      letter-spacing: .07em; padding: 10px 2px 6px;
+    }
     .details-grid {
-      display: none;
+      display: grid;
       grid-template-columns: 1fr 1fr;
       gap: 8px;
-      margin-bottom: 20px;
+      margin-bottom: 12px;
     }
-    .details-grid.open { display: grid; }
     .metric-card {
       background: rgba(255,255,255,.02);
       border: 1px solid var(--border);
-      border-radius: 8px;
-      padding: 10px 12px;
+      border-radius: 8px; padding: 10px 12px;
     }
     .metric-label { font-size: .7rem; color: var(--ink-muted); text-transform: uppercase; letter-spacing: .06em; margin-bottom: 4px; }
     .metric-value { font-size: 1rem; font-weight: 600; color: var(--ink); }
@@ -354,57 +379,44 @@
 
     /* ── Volume indicator ──────────────────────────────────────────────── */
     .volume-bar-wrap {
-      width: 100%;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 6px;
+      width: 100%; display: flex;
+      flex-direction: column; align-items: center; gap: 6px;
     }
     .volume-label {
-      font-size: .72rem;
-      color: var(--ink-muted);
-      letter-spacing: .05em;
-      text-transform: uppercase;
-      min-height: 16px;
-      transition: color .2s;
+      font-size: .72rem; color: var(--ink-muted);
+      letter-spacing: .05em; text-transform: uppercase;
+      min-height: 16px; transition: color .2s;
     }
-    .volume-label.good  { color: var(--green); }
-    .volume-label.low   { color: var(--ink-muted); }
-    .volume-label.loud  { color: var(--amber); }
+    .volume-label.good { color: var(--green); }
+    .volume-label.low  { color: var(--ink-muted); }
+    .volume-label.loud { color: var(--amber); }
     .volume-track {
-      width: 80%;
-      height: 6px;
-      background: var(--border);
-      border-radius: 3px;
-      overflow: hidden;
+      width: 80%; height: 6px;
+      background: var(--border); border-radius: 3px; overflow: hidden;
     }
     .volume-fill {
-      height: 100%;
-      width: 0%;
-      border-radius: 3px;
-      background: var(--border);
+      height: 100%; width: 0%;
+      border-radius: 3px; background: var(--border);
       transition: width .08s linear, background .2s;
     }
-    .volume-fill.good  { background: var(--green); }
-    .volume-fill.low   { background: var(--ink-muted); }
-    .volume-fill.loud  { background: var(--amber); }
+    .volume-fill.good { background: var(--green); }
+    .volume-fill.low  { background: var(--ink-muted); }
+    .volume-fill.loud { background: var(--amber); }
 
     /* ── Error state ───────────────────────────────────────────────────── */
     .error-box {
       background: rgba(248,113,113,.08);
       border: 1px solid rgba(248,113,113,.3);
-      border-radius: 10px;
-      padding: 16px;
-      color: var(--red);
-      font-size: .88rem;
-      line-height: 1.5;
-      margin-bottom: 20px;
+      border-radius: 10px; padding: 16px;
+      color: var(--red); font-size: .88rem;
+      line-height: 1.5; margin-bottom: 20px;
     }
 
     @media (max-width: 400px) {
       .card-body { padding: 20px 18px; }
       .card-header { padding: 20px 18px 16px; }
       .details-grid { grid-template-columns: 1fr; }
+      .scores-row { grid-template-columns: 1fr; }
     }
   </style>
 </head>
@@ -416,126 +428,209 @@
   <div class="card-header">
     <div class="brand">
       <span class="brand-name">VozLab</span>
-      <span class="brand-sub" data-i18n="brand-sub">Triagem Vocal · Voice Screening</span>
-    </div>
-    <div class="lang-toggle">
-      <button class="lang-btn active" onclick="setLang('pt')" id="btn-pt">PT</button>
-      <button class="lang-btn"        onclick="setLang('en')" id="btn-en">EN</button>
+      <span class="brand-sub">Triagem Vocal</span>
     </div>
   </div>
 
   <!-- Body -->
   <div class="card-body">
 
-    <!-- ── Step 1: Instructions ─────────────────────────────────────── -->
+    <!-- ── Step 1: Instructions ──────────────────────────────────────── -->
     <div class="step active" id="step-1">
-      <h2 class="step-title" data-i18n="s1-title">Avalie sua voz em poucos segundos</h2>
+      <h2 class="step-title">Avalie sua voz em dois testes</h2>
 
       <div class="duration-badge">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-        <span data-i18n="s1-duration">5 – 10 segundos de fonação sustentada</span>
+        <span id="badge-duration">2 testes · ~30 segundos no total</span>
       </div>
 
       <ul class="instruction-list">
-        <li><span class="num">1</span><span data-i18n="s1-i1">Encontre um ambiente silencioso e segure o telefone a ~15 cm da boca.</span></li>
-        <li><span class="num">2</span><span data-i18n="s1-i2">Ao iniciar, inspire fundo e diga <strong>"Aaaah"</strong> em tom confortável e constante.</span></li>
-        <li><span class="num">3</span><span data-i18n="s1-i3">A gravação para automaticamente aos 10 s. Você pode parar antes se preferir.</span></li>
-        <li><span class="num">4</span><span data-i18n="s1-i4">Mínimo de 5 s de fonação para análise confiável.</span></li>
+        <li>
+          <span class="num">1</span>
+          <span>Encontre um ambiente silencioso e segure o telefone a ~15 cm da boca.</span>
+        </li>
+        <li>
+          <span class="num">2</span>
+          <span><strong>Teste 1 — Fonação:</strong> inspire fundo e diga <strong>"Aaaah"</strong> em tom constante e confortável até acabar o fôlego (máx. 15 s).</span>
+        </li>
+        <li>
+          <span class="num">3</span>
+          <span><strong>Teste 2 — Fala:</strong> leia em voz alta o texto que aparecerá na tela, em ritmo natural.</span>
+        </li>
+        <li>
+          <span class="num">4</span>
+          <span>Mínimo de 5 s em cada teste para análise confiável.</span>
+        </li>
       </ul>
 
-      <p class="disclaimer" data-i18n="s1-disclaimer">
+      <p class="disclaimer">
         ⚠️ Esta é uma triagem informativa, não um diagnóstico clínico.
         Os resultados não substituem avaliação por fonoaudiólogo ou médico.
       </p>
 
-      <button class="btn btn-primary" onclick="goStep(2)" data-i18n="s1-cta">
-        Iniciar triagem
-      </button>
+      <button class="btn btn-primary" onclick="goStep(2)">Iniciar triagem</button>
     </div>
 
-    <!-- ── Step 2: Recording ────────────────────────────────────────── -->
+    <!-- ── Step 2: Fonação Sustentada ───────────────────────────────── -->
     <div class="step" id="step-2">
-      <h2 class="step-title" data-i18n="s2-title">Grave sua voz</h2>
+
+      <div class="step-progress">
+        <span class="step-dot active"></span>
+        <span class="step-dot-label" style="font-size:.7rem;color:var(--ink-muted)">Teste 1 de 2</span>
+        <span class="step-dot"></span>
+      </div>
+
+      <h2 class="step-title">Fonação sustentada</h2>
+      <p style="font-size:.85rem;color:var(--ink-muted);margin-bottom:20px;">
+        Inspire fundo e diga <strong style="color:var(--ink)">"Aaaah"</strong> até acabar o fôlego.
+      </p>
 
       <div class="record-area">
         <div class="waveform-ring">
           <svg viewBox="0 0 120 120">
             <circle class="ring-track" cx="60" cy="60" r="54" />
-            <circle class="ring-progress" id="ring-progress" cx="60" cy="60" r="54" />
+            <circle class="ring-progress" id="ring-progress-1" cx="60" cy="60" r="54" />
           </svg>
           <div class="ring-inner">
-            <span class="ring-timer" id="timer-display">0:00</span>
-            <span class="ring-label" id="timer-label" data-i18n="s2-timer-idle">pronto</span>
+            <span class="ring-timer" id="timer-display-1">0:00</span>
+            <span class="ring-label" id="timer-label-1">pronto</span>
           </div>
         </div>
 
-        <button class="record-btn" id="record-btn" onclick="toggleRecording()">
-          <!-- mic icon -->
-          <svg id="icon-mic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <button class="record-btn" id="record-btn-1" onclick="toggleRecording()">
+          <svg id="icon-mic-1" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/>
-            <path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/>
+            <path d="M19 10v2a7 7 0 0 1-14 0v-2"/>
+            <line x1="12" y1="19" x2="12" y2="23"/>
             <line x1="8" y1="23" x2="16" y2="23"/>
           </svg>
-          <!-- stop icon (hidden) -->
-          <svg id="icon-stop" viewBox="0 0 24 24" fill="currentColor" style="display:none">
+          <svg id="icon-stop-1" viewBox="0 0 24 24" fill="currentColor" style="display:none">
             <rect x="4" y="4" width="16" height="16" rx="2"/>
           </svg>
         </button>
 
-        <p class="rec-status" id="rec-status" data-i18n="s2-status-idle">
-          Toque para iniciar gravação
-        </p>
+        <p class="rec-status" id="rec-status-1">Toque para iniciar gravação</p>
 
-        <div class="volume-bar-wrap" id="volume-wrap" style="display:none">
-          <div class="volume-track"><div class="volume-fill" id="volume-fill"></div></div>
-          <span class="volume-label" id="volume-label"></span>
+        <div class="volume-bar-wrap" id="volume-wrap-1" style="display:none">
+          <div class="volume-track"><div class="volume-fill" id="volume-fill-1"></div></div>
+          <span class="volume-label" id="volume-label-1"></span>
         </div>
       </div>
 
-      <button class="btn btn-secondary" onclick="goStep(1)" data-i18n="s2-back">← Voltar</button>
+      <button class="btn btn-secondary" onclick="goStep(1)">← Voltar</button>
     </div>
 
-    <!-- ── Step 3: Processing ───────────────────────────────────────── -->
+    <!-- ── Step 3: Fala Contínua (CAPE-V) ───────────────────────────── -->
     <div class="step" id="step-3">
+
+      <div class="step-progress">
+        <span class="step-dot done"></span>
+        <span class="step-dot-label" style="font-size:.7rem;color:var(--ink-muted)">Teste 2 de 2</span>
+        <span class="step-dot active"></span>
+      </div>
+
+      <h2 class="step-title">Fala contínua</h2>
+
+      <div class="passage-card">
+        <div class="passage-label">Leia em voz alta</div>
+        <p class="passage-text">
+          "Érica tomou suco de pêra e amora.<br>
+          Sônia sabe sambar sozinha.<br>
+          Olha lá o avião azul."
+        </p>
+      </div>
+      <p class="passage-hint">Em ritmo natural, sem pressa. Toque para iniciar.</p>
+
+      <div class="record-area">
+        <div class="waveform-ring">
+          <svg viewBox="0 0 120 120">
+            <circle class="ring-track" cx="60" cy="60" r="54" />
+            <circle class="ring-progress" id="ring-progress-2" cx="60" cy="60" r="54" />
+          </svg>
+          <div class="ring-inner">
+            <span class="ring-timer" id="timer-display-2">0:00</span>
+            <span class="ring-label" id="timer-label-2">pronto</span>
+          </div>
+        </div>
+
+        <button class="record-btn" id="record-btn-2" onclick="toggleRecording()">
+          <svg id="icon-mic-2" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/>
+            <path d="M19 10v2a7 7 0 0 1-14 0v-2"/>
+            <line x1="12" y1="19" x2="12" y2="23"/>
+            <line x1="8" y1="23" x2="16" y2="23"/>
+          </svg>
+          <svg id="icon-stop-2" viewBox="0 0 24 24" fill="currentColor" style="display:none">
+            <rect x="4" y="4" width="16" height="16" rx="2"/>
+          </svg>
+        </button>
+
+        <p class="rec-status" id="rec-status-2">Toque para iniciar gravação</p>
+
+        <div class="volume-bar-wrap" id="volume-wrap-2" style="display:none">
+          <div class="volume-track"><div class="volume-fill" id="volume-fill-2"></div></div>
+          <span class="volume-label" id="volume-label-2"></span>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── Step 4: Processing ────────────────────────────────────────── -->
+    <div class="step" id="step-4">
       <div class="processing-area">
         <div class="spinner"></div>
-        <p style="font-size:.9rem; color:var(--ink-muted)" data-i18n="s3-title">Analisando sua voz…</p>
+        <p style="font-size:.9rem; color:var(--ink-muted)">Analisando sua voz…</p>
         <div class="processing-steps">
           <div class="proc-step active" id="ps-upload">
-            <span class="proc-dot"></span>
-            <span data-i18n="ps-upload">Enviando áudio</span>
+            <span class="proc-dot"></span><span>Enviando áudios</span>
           </div>
           <div class="proc-step" id="ps-extract">
-            <span class="proc-dot"></span>
-            <span data-i18n="ps-extract">Extraindo parâmetros acústicos</span>
+            <span class="proc-dot"></span><span>Extraindo parâmetros acústicos</span>
           </div>
           <div class="proc-step" id="ps-score">
-            <span class="proc-dot"></span>
-            <span data-i18n="ps-score">Calculando pontuação vocal</span>
+            <span class="proc-dot"></span><span>Calculando pontuações</span>
           </div>
           <div class="proc-step" id="ps-result">
-            <span class="proc-dot"></span>
-            <span data-i18n="ps-result">Preparando resultado</span>
+            <span class="proc-dot"></span><span>Preparando resultado</span>
           </div>
         </div>
       </div>
     </div>
 
-    <!-- ── Step 4: Results ──────────────────────────────────────────── -->
-    <div class="step" id="step-4">
+    <!-- ── Step 5: Results ───────────────────────────────────────────── -->
+    <div class="step" id="step-5">
 
-      <div class="score-display">
-        <div class="score-ring">
-          <svg viewBox="0 0 100 100">
-            <circle class="score-bg" cx="50" cy="50" r="45"/>
-            <circle class="score-fill" id="score-arc" cx="50" cy="50" r="45"/>
-          </svg>
-          <div class="score-number">
-            <span class="score-val" id="score-val">—</span>
-            <span class="score-max">/10</span>
+      <div class="scores-row">
+        <!-- Panel 1: Fonação -->
+        <div class="score-panel">
+          <div class="panel-label">Fonação</div>
+          <div class="score-ring">
+            <svg viewBox="0 0 100 100">
+              <circle class="score-bg" cx="50" cy="50" r="45"/>
+              <circle class="score-fill" id="score-arc-1" cx="50" cy="50" r="45"/>
+            </svg>
+            <div class="score-number">
+              <span class="score-val" id="score-val-1">—</span>
+              <span class="score-max">/10</span>
+            </div>
           </div>
+          <span class="score-badge" id="score-badge-1"></span>
         </div>
-        <span class="score-badge" id="score-badge"></span>
+
+        <!-- Panel 2: Fala -->
+        <div class="score-panel">
+          <div class="panel-label">Fala Contínua</div>
+          <div class="score-ring">
+            <svg viewBox="0 0 100 100">
+              <circle class="score-bg" cx="50" cy="50" r="45"/>
+              <circle class="score-fill" id="score-arc-2" cx="50" cy="50" r="45"/>
+            </svg>
+            <div class="score-number">
+              <span class="score-val" id="score-val-2">—</span>
+              <span class="score-max">/10</span>
+            </div>
+          </div>
+          <span class="score-badge" id="score-badge-2"></span>
+        </div>
       </div>
 
       <p class="patient-msg" id="patient-msg"></p>
@@ -543,14 +638,17 @@
       <div class="recommendations" id="recs-list"></div>
 
       <button class="details-toggle" id="details-toggle" onclick="toggleDetails()">
-        <span data-i18n="details-toggle">Detalhes técnicos</span>
+        <span>Detalhes técnicos</span>
         <svg class="chevron" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
       </button>
-      <div class="details-grid" id="details-grid"></div>
+      <div class="details-wrap" id="details-wrap">
+        <div class="details-section-label">Fonação Sustentada</div>
+        <div class="details-grid" id="details-grid-1"></div>
+        <div class="details-section-label">Fala Contínua</div>
+        <div class="details-grid" id="details-grid-2"></div>
+      </div>
 
-      <button class="btn btn-primary" onclick="restart()" data-i18n="s4-restart">
-        Nova triagem
-      </button>
+      <button class="btn btn-primary" onclick="restart()">Nova triagem</button>
     </div>
 
   </div><!-- /card-body -->
@@ -558,15 +656,13 @@
 
 <script>
 /* ══════════════════════════════════════════════════════════════════════════
-   CONFIG — reads limits from the API so the frontend never hardcodes them
+   CONFIG
    ══════════════════════════════════════════════════════════════════════════ */
 const API_BASE = (window.VOZLAB_API_URL || 'https://lxs48psrg9.execute-api.us-east-1.amazonaws.com').replace(/\/$/, '');
 
-// Defaults — overwritten by GET /config on load
 let CFG = {
-  max_duration_seconds: 10,
+  max_duration_seconds: 15,
   min_duration_seconds: 5,
-  allowed_mime_types: ['audio/webm;codecs=opus','audio/ogg;codecs=opus','audio/wav'],
 };
 
 async function loadConfig() {
@@ -574,116 +670,6 @@ async function loadConfig() {
     const r = await fetch(`${API_BASE}/config`);
     if (r.ok) CFG = await r.json();
   } catch (_) { /* use defaults */ }
-}
-
-/* ══════════════════════════════════════════════════════════════════════════
-   i18n
-   ══════════════════════════════════════════════════════════════════════════ */
-const I18N = {
-  'pt': {
-    'brand-sub':      'Triagem Vocal · Voice Screening',
-    's1-title':       'Avalie sua voz em poucos segundos',
-    's1-duration':    `5 – 10 segundos de fonação sustentada`,
-    's1-i1':          'Encontre um ambiente silencioso e segure o telefone a ~15 cm da boca.',
-    's1-i2':          'Ao iniciar, inspire fundo e diga <strong>"Aaaah"</strong> em tom confortável e constante.',
-    's1-i3':          'Sustente até sentir falta de ar — a gravação para automaticamente. Quanto mais longo, melhor o resultado.',
-    's1-i4':          `Mínimo de 5 s. Tente sustentar até o fim — esse tempo é medido clinicamente.`,
-    's1-disclaimer':  '⚠️ Esta é uma triagem informativa, não um diagnóstico clínico. Os resultados não substituem avaliação por fonoaudiólogo ou médico.',
-    's1-cta':         'Iniciar triagem',
-    's2-title':       'Grave sua voz',
-    's2-timer-idle':  'pronto',
-    's2-timer-live':  'gravando',
-    's2-status-idle': 'Toque para iniciar gravação',
-    's2-status-live': '● Gravando — diga "Aaaah"',
-    's2-status-done': 'Gravação concluída',
-    's2-back':        '← Voltar',
-    's3-title':       'Analisando sua voz…',
-    'ps-upload':      'Enviando áudio',
-    'ps-extract':     'Extraindo parâmetros acústicos',
-    'ps-score':       'Calculando pontuação vocal',
-    'ps-result':      'Preparando resultado',
-    'details-toggle': 'Detalhes técnicos',
-    's4-restart':     'Nova triagem',
-    'risk-low':       'Risco baixo',
-    'risk-moderate':  'Risco moderado',
-    'risk-high':      'Risco elevado',
-    'metric-f0':      'F0 médio',
-    'metric-jitter':  'Jitter',
-    'metric-shimmer': 'Shimmer',
-    'metric-hnr':     'HNR',
-    'metric-voiced':  '% Vozeado',
-    'metric-stability':'Estabilidade',
-    'metric-mpt':     'TMF (fonação)',
-    'mpt-normal':     'Normal',
-    'mpt-borderline': 'Limítrofe',
-    'mpt-low':        'Reduzido',
-    'vol-low':        'muito baixo',
-    'vol-good':       'bom nível',
-    'vol-loud':       'muito alto',
-    'err-short':      'Gravação muito curta. Grave pelo menos 5 s de fonação.',
-    'err-generic':    'Não foi possível analisar o áudio. Tente novamente.',
-    'err-mic':        'Microfone não autorizado. Permita o acesso e tente novamente.',
-  },
-  'en': {
-    'brand-sub':      'Triagem Vocal · Voice Screening',
-    's1-title':       'Screen your voice in seconds',
-    's1-duration':    `5 – 10 seconds of sustained phonation`,
-    's1-i1':          'Find a quiet place and hold the phone ~15 cm from your mouth.',
-    's1-i2':          'Take a deep breath and say a steady <strong>"Aaaah"</strong> at a comfortable pitch.',
-    's1-i3':          'Sustain until you run out of breath — the recording stops automatically. Longer is better.',
-    's1-i4':          `Minimum 5 s. Try to sustain until the end — that time is measured clinically.`,
-    's1-disclaimer':  '⚠️ This is an informational screening, not a clinical diagnosis. Results do not replace evaluation by a speech therapist or physician.',
-    's1-cta':         'Start screening',
-    's2-title':       'Record your voice',
-    's2-timer-idle':  'ready',
-    's2-timer-live':  'recording',
-    's2-status-idle': 'Tap to start recording',
-    's2-status-live': '● Recording — say "Aaaah"',
-    's2-status-done': 'Recording complete',
-    's2-back':        '← Back',
-    's3-title':       'Analysing your voice…',
-    'ps-upload':      'Uploading audio',
-    'ps-extract':     'Extracting acoustic parameters',
-    'ps-score':       'Computing vocal score',
-    'ps-result':      'Preparing result',
-    'details-toggle': 'Technical details',
-    's4-restart':     'New screening',
-    'risk-low':       'Low risk',
-    'risk-moderate':  'Moderate risk',
-    'risk-high':      'High risk',
-    'metric-f0':      'Mean F0',
-    'metric-jitter':  'Jitter',
-    'metric-shimmer': 'Shimmer',
-    'metric-hnr':     'HNR',
-    'metric-voiced':  '% Voiced',
-    'metric-stability':'Stability',
-    'metric-mpt':     'MPT (phonation)',
-    'mpt-normal':     'Normal',
-    'mpt-borderline': 'Borderline',
-    'mpt-low':        'Reduced',
-    'vol-low':        'too quiet',
-    'vol-good':       'good level',
-    'vol-loud':       'too loud',
-    'err-short':      'Recording too short. Please record at least 5 s of phonation.',
-    'err-generic':    'Could not analyse audio. Please try again.',
-    'err-mic':        'Microphone not allowed. Please grant access and try again.',
-  }
-};
-
-let lang = 'pt';
-function t(key) { return I18N[lang][key] || key; }
-
-function setLang(l) {
-  lang = l;
-  document.getElementById('btn-pt').classList.toggle('active', l === 'pt');
-  document.getElementById('btn-en').classList.toggle('active', l === 'en');
-  document.querySelectorAll('[data-i18n]').forEach(el => {
-    const key = el.getAttribute('data-i18n');
-    el.innerHTML = t(key);
-  });
-  // Update duration badge dynamically
-  document.querySelector('[data-i18n="s1-duration"]').textContent =
-    `5 – ${CFG.max_duration_seconds} ${l === 'pt' ? 'segundos de fonação sustentada' : 'seconds of sustained phonation'}`;
 }
 
 /* ══════════════════════════════════════════════════════════════════════════
@@ -696,10 +682,13 @@ function goStep(n) {
 }
 
 /* ══════════════════════════════════════════════════════════════════════════
-   RECORDING — Web Audio API + client-side WAV encoding
-   Works in Chrome, Firefox, Safari. No MediaRecorder, no ffmpeg needed.
+   RECORDING STATE
    ══════════════════════════════════════════════════════════════════════════ */
-let pcmChunks      = [];   // Float32Array chunks collected during recording
+let recordingPhase = 1;   // 1 = Ahhh, 2 = CAPE-V
+let pcmChunks      = [];  // current recording chunks
+let pcmChunks1     = [];  // saved after phase 1
+let pcmChunks2     = [];  // saved after phase 2
+
 let recordStream   = null;
 let scriptNode     = null;
 let timerInterval  = null;
@@ -708,8 +697,13 @@ let isRecording    = false;
 let audioContext   = null;
 let volumeAnimFrame = null;
 
-const CIRCUMFERENCE = 339.3;  // 2π × 54
-const RECORD_SR     = 22050;  // target sample rate — matches backend TARGET_SR
+const CIRCUMFERENCE = 339.3;
+const RECORD_SR     = 22050;
+
+/* ══════════════════════════════════════════════════════════════════════════
+   RECORDING HELPERS — all phase-aware via suffix -1 / -2
+   ══════════════════════════════════════════════════════════════════════════ */
+function p(id) { return document.getElementById(id + '-' + recordingPhase); }
 
 async function toggleRecording() {
   if (isRecording) stopRecording();
@@ -728,15 +722,13 @@ async function startRecording() {
     });
 
     audioContext = new AudioContext({ sampleRate: RECORD_SR });
-    const source  = audioContext.createMediaStreamSource(recordStream);
+    const source = audioContext.createMediaStreamSource(recordStream);
 
-    // Volume monitor
     const analyser = audioContext.createAnalyser();
     analyser.fftSize = 256;
     source.connect(analyser);
     startVolumeMonitor(analyser);
 
-    // PCM capture via ScriptProcessorNode
     pcmChunks  = [];
     scriptNode = audioContext.createScriptProcessor(4096, 1, 1);
     scriptNode.onaudioprocess = e => {
@@ -748,15 +740,13 @@ async function startRecording() {
     isRecording = true;
     elapsedSec  = 0;
 
-    document.getElementById('volume-wrap').style.display = '';
-
-    // UI
-    document.getElementById('record-btn').classList.add('recording');
-    document.getElementById('icon-mic').style.display  = 'none';
-    document.getElementById('icon-stop').style.display = 'block';
-    document.getElementById('rec-status').className    = 'rec-status live';
-    document.getElementById('rec-status').textContent  = t('s2-status-live');
-    document.getElementById('timer-label').textContent = t('s2-timer-live');
+    p('volume-wrap').style.display = '';
+    p('record-btn').classList.add('recording');
+    p('icon-mic').style.display  = 'none';
+    p('icon-stop').style.display = 'block';
+    p('rec-status').className    = 'rec-status live';
+    p('rec-status').textContent  = '● Gravando…';
+    p('timer-label').textContent = 'gravando';
 
     timerInterval = setInterval(() => {
       elapsedSec++;
@@ -765,7 +755,7 @@ async function startRecording() {
     }, 1000);
 
   } catch (err) {
-    showError(t('err-mic'), null);
+    showError('Microfone não autorizado. Permita o acesso e tente novamente.');
   }
 }
 
@@ -774,30 +764,35 @@ function stopRecording() {
   clearInterval(timerInterval);
   isRecording = false;
 
-  // Disconnect PCM capture node
   if (scriptNode) { scriptNode.disconnect(); scriptNode = null; }
-
-  // Stop mic stream
   if (recordStream) { recordStream.getTracks().forEach(t => t.stop()); recordStream = null; }
-
-  // Stop volume monitor and close AudioContext
   stopVolumeMonitor();
 
-  // UI
-  document.getElementById('record-btn').classList.remove('recording');
-  document.getElementById('icon-mic').style.display  = 'block';
-  document.getElementById('icon-stop').style.display = 'none';
-  document.getElementById('rec-status').className    = 'rec-status';
-  document.getElementById('rec-status').textContent  = t('s2-status-done');
-  document.getElementById('timer-label').textContent  = t('s2-timer-idle');
-  document.getElementById('volume-wrap').style.display = 'none';
+  p('record-btn').classList.remove('recording');
+  p('icon-mic').style.display  = 'block';
+  p('icon-stop').style.display = 'none';
+  p('rec-status').className    = 'rec-status';
+  p('rec-status').textContent  = 'Gravação concluída';
+  p('timer-label').textContent = 'pronto';
+  p('volume-wrap').style.display = 'none';
 
-  // Kick off upload
-  handleRecordingDone();
+  if (recordingPhase === 1) {
+    // Save phase 1, advance to CAPE-V step
+    pcmChunks1    = pcmChunks;
+    pcmChunks     = [];
+    recordingPhase = 2;
+    goStep(3);
+  } else {
+    // Save phase 2, upload both and analyse
+    pcmChunks2 = pcmChunks;
+    pcmChunks  = [];
+    handleRecordingsDone();
+  }
 }
 
 function startVolumeMonitor(analyser) {
   const data = new Uint8Array(analyser.frequencyBinCount);
+  const phase = recordingPhase;
   function tick() {
     analyser.getByteTimeDomainData(data);
     let sum = 0;
@@ -805,20 +800,20 @@ function startVolumeMonitor(analyser) {
       const v = (data[i] - 128) / 128;
       sum += v * v;
     }
-    const rms = Math.sqrt(sum / data.length);
-    const db  = 20 * Math.log10(Math.max(rms, 1e-7));
-    // db range: ~-60 (silence) to 0 (clip)
-    // map -50..–5 dB → 0..100%
+    const rms   = Math.sqrt(sum / data.length);
+    const db    = 20 * Math.log10(Math.max(rms, 1e-7));
     const pct   = Math.min(100, Math.max(0, (db + 50) / 45 * 100));
     const state = db < -35 ? 'low' : db > -10 ? 'loud' : 'good';
+    const labels = { low: 'muito baixo', good: 'bom nível', loud: 'muito alto' };
 
-    const fill  = document.getElementById('volume-fill');
-    const label = document.getElementById('volume-label');
-    fill.style.width = pct + '%';
-    fill.className   = 'volume-fill ' + state;
-    label.className  = 'volume-label ' + state;
-    label.textContent = t('vol-' + state);
-
+    const fill  = document.getElementById('volume-fill-'  + phase);
+    const label = document.getElementById('volume-label-' + phase);
+    if (fill && label) {
+      fill.style.width  = pct + '%';
+      fill.className    = 'volume-fill '  + state;
+      label.className   = 'volume-label ' + state;
+      label.textContent = labels[state];
+    }
     volumeAnimFrame = requestAnimationFrame(tick);
   }
   tick();
@@ -832,238 +827,172 @@ function stopVolumeMonitor() {
 function updateTimer(sec) {
   const m = Math.floor(sec / 60);
   const s = String(sec % 60).padStart(2, '0');
-  document.getElementById('timer-display').textContent = `${m}:${s}`;
-
-  // Ring progress
-  const frac    = Math.min(sec / CFG.max_duration_seconds, 1);
-  const offset  = CIRCUMFERENCE * (1 - frac);
-  document.getElementById('ring-progress').style.strokeDashoffset = offset;
+  p('timer-display').textContent = `${m}:${s}`;
+  const offset = CIRCUMFERENCE * (1 - Math.min(sec / CFG.max_duration_seconds, 1));
+  p('ring-progress').style.strokeDashoffset = offset;
 }
 
 /* ══════════════════════════════════════════════════════════════════════════
-   UPLOAD → POLL FLOW
+   UPLOAD + POLL — both recordings in parallel
    ══════════════════════════════════════════════════════════════════════════ */
-async function handleRecordingDone() {
-  const wavBuffer  = encodeWav(mergeBuffers(pcmChunks), RECORD_SR);
-  const mimeType   = 'audio/wav';
-  const blob       = new Blob([wavBuffer], { type: mimeType });
-  const filename   = 'recording.wav';
+async function handleRecordingsDone() {
+  const blob1 = new Blob([encodeWav(mergeBuffers(pcmChunks1), RECORD_SR)], { type: 'audio/wav' });
+  const blob2 = new Blob([encodeWav(mergeBuffers(pcmChunks2), RECORD_SR)], { type: 'audio/wav' });
 
-  goStep(3);
+  goStep(4);
   setProcessStep('ps-upload', 'active');
 
   try {
-    // 1 — Get presigned upload URL
-    const urlResp = await fetch(`${API_BASE}/upload-url`, {
-      method:  'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body:    JSON.stringify({
-        filename,
-        mime_type:       mimeType,
-        file_size_bytes: blob.size,
+    // 1 — Get both presigned URLs
+    const [resp1, resp2] = await Promise.all([
+      fetch(`${API_BASE}/upload-url`, {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ filename: 'phonation.wav', mime_type: 'audio/wav', file_size_bytes: blob1.size }),
       }),
-    });
+      fetch(`${API_BASE}/upload-url`, {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ filename: 'speech.wav', mime_type: 'audio/wav', file_size_bytes: blob2.size }),
+      }),
+    ]);
+    if (!resp1.ok || !resp2.ok) throw new Error('Não foi possível obter URL de upload.');
+    const { audio_id: id1, upload_url: url1 } = await resp1.json();
+    const { audio_id: id2, upload_url: url2 } = await resp2.json();
 
-    if (!urlResp.ok) {
-      const err = await urlResp.json().catch(() => ({}));
-      throw new Error(err.detail || t('err-generic'));
-    }
-
-    const { audio_id, upload_url } = await urlResp.json();
-
-    // 2 — Upload directly to S3
-    const putResp = await fetch(upload_url, {
-      method:  'PUT',
-      headers: { 'Content-Type': mimeType },
-      body:    blob,
-    });
-    if (!putResp.ok) throw new Error('S3 upload failed');
+    // 2 — Upload both to S3
+    const [put1, put2] = await Promise.all([
+      fetch(url1, { method: 'PUT', headers: { 'Content-Type': 'audio/wav' }, body: blob1 }),
+      fetch(url2, { method: 'PUT', headers: { 'Content-Type': 'audio/wav' }, body: blob2 }),
+    ]);
+    if (!put1.ok || !put2.ok) throw new Error('Falha no envio do áudio.');
 
     setProcessStep('ps-upload', 'done');
     setProcessStep('ps-extract', 'active');
 
-    // 3 — Poll for result
-    const result = await pollResult(audio_id);
+    // 3 — Poll both in parallel
+    const [result1, result2] = await Promise.all([pollResult(id1), pollResult(id2)]);
 
     setProcessStep('ps-extract', 'done');
     setProcessStep('ps-score', 'done');
     setProcessStep('ps-result', 'active');
-
     await sleep(400);
     setProcessStep('ps-result', 'done');
     await sleep(300);
 
-    renderResult(result);
-    goStep(4);
+    renderResults(result1, result2);
+    goStep(5);
 
   } catch (err) {
-    showError(err.message || t('err-generic'), null);
+    showError(err.message || 'Não foi possível analisar o áudio. Tente novamente.');
   }
 }
 
 async function pollResult(audioId, maxAttempts = 30, intervalMs = 1000) {
   for (let i = 0; i < maxAttempts; i++) {
     await sleep(intervalMs);
-    // Gentle backoff after 5 attempts
     if (i >= 5) intervalMs = Math.min(intervalMs * 1.3, 4000);
-
     const r = await fetch(`${API_BASE}/result/${audioId}`);
     if (!r.ok) continue;
-
     const data = await r.json();
-
     if (data.status === 'complete') return data.result;
-    if (data.status === 'failed')   throw new Error(data.error_message || t('err-generic'));
-    // pending | processing — keep polling
+    if (data.status === 'failed')   throw new Error(data.error_message || 'Análise falhou.');
   }
-  throw new Error(t('err-generic'));
+  throw new Error('Tempo limite excedido. Tente novamente.');
 }
 
 /* ══════════════════════════════════════════════════════════════════════════
    RESULT RENDERING
    ══════════════════════════════════════════════════════════════════════════ */
-function renderResult(result) {
-  const score      = result.overall_health_score;
-  const risk       = result.pathology_risk.overall_risk;   // 'low'|'moderate'|'high'
-  const fp         = result.fundamental_parameters;
-  const amp        = result.amplitude_parameters;
-  const ci         = result.clinical_indicators;
-  const pr         = result.pathology_risk;
+function renderResults(r1, r2) {
+  renderScorePanel(1, r1);
+  renderScorePanel(2, r2);
 
-  // Score arc
-  const arc    = document.getElementById('score-arc');
-  const frac   = score / 10;
-  const offset = 283 * (1 - frac);
-  const colour = score >= 7 ? '#4ade80' : score >= 5 ? '#fbbf24' : '#f87171';
-  arc.style.stroke            = colour;
-  arc.style.strokeDashoffset  = offset;
+  // Patient message: use the more severe result
+  const riskOrder = { low: 0, moderate: 1, high: 2 };
+  const worst = riskOrder[r2.pathology_risk.overall_risk] >= riskOrder[r1.pathology_risk.overall_risk] ? r2 : r1;
+  document.getElementById('patient-msg').textContent = worst.patient_message_pt;
 
-  document.getElementById('score-val').textContent   = score.toFixed(1);
-  document.getElementById('score-val').style.color   = colour;
+  // Recommendations: merge both, deduplicate (disclaimer appears in both)
+  const combined = [...r1.recommendations_pt];
+  r2.recommendations_pt.forEach(rec => {
+    if (!combined.includes(rec)) combined.push(rec);
+  });
 
-  const badge = document.getElementById('score-badge');
-  badge.textContent  = t(`risk-${risk}`);
-  badge.className    = `score-badge badge-${risk}`;
-
-  // Message (uses current UI language)
-  document.getElementById('patient-msg').textContent =
-    lang === 'pt' ? result.patient_message_pt : result.patient_message_en;
-
-  // Recommendations
-  const recs = lang === 'pt' ? result.recommendations_pt : result.recommendations_en;
-  const recsList = document.getElementById('recs-list');
-  recsList.innerHTML = recs.map(r => `
+  document.getElementById('recs-list').innerHTML = combined.map(rec => `
     <div class="rec-item">
       <svg class="rec-icon" width="14" height="14" viewBox="0 0 24 24" fill="none"
            stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
         <polyline points="9 18 15 12 9 6"/>
       </svg>
-      <span>${r}</span>
+      <span>${rec}</span>
     </div>
   `).join('');
 
-  // Technical details grid
-  const statusClass = (s) => s === 'normal' ? 'ok' : s === 'elevated' ? 'bad' : 'warn';
-  const stabilityClass = ci.voice_stability === 'stable' ? 'ok' : 'bad';
-  const stabilityLabel = ci.voice_stability === 'stable'
-    ? (lang === 'pt' ? 'Estável' : 'Stable')
-    : (lang === 'pt' ? 'Instável' : 'Unstable');
+  // Technical details
+  renderDetailGrid('details-grid-1', r1);
+  renderDetailGrid('details-grid-2', r2);
+}
 
+function renderScorePanel(n, result) {
+  const score  = result.overall_health_score;
+  const risk   = result.pathology_risk.overall_risk;
+  const colour = score >= 7 ? '#4ade80' : score >= 5 ? '#fbbf24' : '#f87171';
+  const riskPT = { low: 'Risco baixo', moderate: 'Risco moderado', high: 'Risco elevado' };
+
+  const arc = document.getElementById('score-arc-' + n);
+  arc.style.stroke           = colour;
+  arc.style.strokeDashoffset = 283 * (1 - score / 10);
+
+  const val = document.getElementById('score-val-' + n);
+  val.textContent = score.toFixed(1);
+  val.style.color = colour;
+
+  const badge = document.getElementById('score-badge-' + n);
+  badge.textContent = riskPT[risk];
+  badge.className   = `score-badge badge-${risk}`;
+}
+
+function renderDetailGrid(gridId, result) {
+  const fp = result.fundamental_parameters;
+  const amp = result.amplitude_parameters;
+  const ci  = result.clinical_indicators;
+  const pr  = result.pathology_risk;
+
+  const sc = s => s === 'normal' ? 'ok' : s === 'elevated' ? 'bad' : 'warn';
   const mptClass = ci.mpt_status === 'normal' ? 'ok' : ci.mpt_status === 'reduced' ? 'warn' : 'bad';
-  const mptLabel = t('mpt-' + (ci.mpt_status === 'normal' ? 'normal' : ci.mpt_status === 'reduced' ? 'borderline' : 'low'));
+  const mptLabel = { normal: 'Normal', reduced: 'Limítrofe', elevated: 'Reduzido' }[ci.mpt_status];
+  const stabClass = ci.voice_stability === 'stable' ? 'ok' : 'bad';
+  const stabLabel = ci.voice_stability === 'stable' ? 'Estável' : 'Instável';
 
-  document.getElementById('details-grid').innerHTML = `
+  document.getElementById(gridId).innerHTML = `
     <div class="metric-card">
-      <div class="metric-label">${t('metric-f0')}</div>
+      <div class="metric-label">F0 médio</div>
       <div class="metric-value">${fp.f0_mean_hz.toFixed(1)} Hz</div>
     </div>
     <div class="metric-card">
-      <div class="metric-label">${t('metric-mpt')}</div>
+      <div class="metric-label">TMF</div>
       <div class="metric-value ${mptClass}">${ci.mpt_seconds.toFixed(1)}s — ${mptLabel}</div>
     </div>
     <div class="metric-card">
-      <div class="metric-label">${t('metric-jitter')}</div>
-      <div class="metric-value ${statusClass(pr.jitter_status)}">${fp.jitter_relative_pct.toFixed(2)}%</div>
+      <div class="metric-label">Jitter</div>
+      <div class="metric-value ${sc(pr.jitter_status)}">${fp.jitter_relative_pct.toFixed(2)}%</div>
     </div>
     <div class="metric-card">
-      <div class="metric-label">${t('metric-shimmer')}</div>
-      <div class="metric-value ${statusClass(pr.shimmer_status)}">${amp.shimmer_local_db.toFixed(2)} dB</div>
+      <div class="metric-label">Shimmer</div>
+      <div class="metric-value ${sc(pr.shimmer_status)}">${amp.shimmer_local_db.toFixed(2)} dB</div>
     </div>
     <div class="metric-card">
-      <div class="metric-label">${t('metric-hnr')}</div>
-      <div class="metric-value ${statusClass(pr.hnr_status)}">${ci.hnr_db.toFixed(1)} dB</div>
+      <div class="metric-label">HNR</div>
+      <div class="metric-value ${sc(pr.hnr_status)}">${ci.hnr_db.toFixed(1)} dB</div>
     </div>
     <div class="metric-card">
-      <div class="metric-label">${t('metric-voiced')}</div>
-      <div class="metric-value">${fp.voiced_fraction_pct.toFixed(1)}%</div>
-    </div>
-    <div class="metric-card">
-      <div class="metric-label">${t('metric-stability')}</div>
-      <div class="metric-value ${stabilityClass}">${stabilityLabel}</div>
+      <div class="metric-label">Estabilidade</div>
+      <div class="metric-value ${stabClass}">${stabLabel}</div>
     </div>
   `;
 }
 
 /* ══════════════════════════════════════════════════════════════════════════
-   HELPERS
-   ══════════════════════════════════════════════════════════════════════════ */
-function setProcessStep(id, state) {
-  const el = document.getElementById(id);
-  el.className = `proc-step${state === 'done' ? ' done' : state === 'active' ? ' active' : ''}`;
-}
-
-function toggleDetails() {
-  const grid   = document.getElementById('details-grid');
-  const toggle = document.getElementById('details-toggle');
-  const open   = grid.classList.toggle('open');
-  toggle.classList.toggle('open', open);
-}
-
-function showError(msg, _) {
-  goStep(4);
-  const body = document.querySelector('#step-4');
-  // Remove old error box if present
-  body.querySelector('.error-box')?.remove();
-  const box = document.createElement('div');
-  box.className   = 'error-box';
-  box.textContent = msg;
-  body.insertBefore(box, body.querySelector('.btn-primary'));
-  // Hide score display for error state
-  document.querySelector('.score-display').style.display  = 'none';
-  document.querySelector('.patient-msg').style.display    = 'none';
-  document.querySelector('#recs-list').style.display      = 'none';
-  document.querySelector('#details-toggle').style.display = 'none';
-}
-
-function restart() {
-  // Reset recording state
-  elapsedSec = 0;
-  pcmChunks = [];
-  updateTimer(0);
-  document.getElementById('ring-progress').style.strokeDashoffset = CIRCUMFERENCE;
-  document.getElementById('rec-status').textContent = t('s2-status-idle');
-
-  // Reset processing steps
-  ['ps-upload','ps-extract','ps-score','ps-result'].forEach(id =>
-    setProcessStep(id, ''));
-  setProcessStep('ps-upload', 'active');
-
-  // Reset result display
-  document.querySelector('.score-display').style.display  = '';
-  document.querySelector('.patient-msg').style.display    = '';
-  document.querySelector('#recs-list').style.display      = '';
-  document.querySelector('#details-toggle').style.display = '';
-  document.querySelector('.error-box')?.remove();
-  document.getElementById('details-grid').classList.remove('open');
-  document.getElementById('details-toggle').classList.remove('open');
-
-  goStep(1);
-}
-
-function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
-
-/* ══════════════════════════════════════════════════════════════════════════
-   WAV ENCODING — merges Float32 PCM chunks and writes a RIFF/WAV file
+   WAV ENCODING
    ══════════════════════════════════════════════════════════════════════════ */
 function mergeBuffers(chunks) {
   const total  = chunks.reduce((n, c) => n + c.length, 0);
@@ -1074,30 +1003,20 @@ function mergeBuffers(chunks) {
 }
 
 function encodeWav(samples, sampleRate) {
-  const numChannels  = 1;
-  const bitsPerSample = 16;
-  const byteRate     = sampleRate * numChannels * bitsPerSample / 8;
-  const blockAlign   = numChannels * bitsPerSample / 8;
-  const dataLen      = samples.length * 2;           // 2 bytes per Int16 sample
-  const buffer       = new ArrayBuffer(44 + dataLen);
-  const view         = new DataView(buffer);
-
-  // RIFF chunk
+  const dataLen  = samples.length * 2;
+  const buffer   = new ArrayBuffer(44 + dataLen);
+  const view     = new DataView(buffer);
   writeStr(view, 0,  'RIFF');
   view.setUint32(4,  36 + dataLen, true);
   writeStr(view, 8,  'WAVE');
-
-  // fmt sub-chunk
   writeStr(view, 12, 'fmt ');
-  view.setUint32(16, 16, true);           // PCM chunk size
-  view.setUint16(20, 1,  true);           // PCM format
-  view.setUint16(22, numChannels, true);
-  view.setUint32(24, sampleRate,  true);
-  view.setUint32(28, byteRate,    true);
-  view.setUint16(32, blockAlign,  true);
-  view.setUint16(34, bitsPerSample, true);
-
-  // data sub-chunk
+  view.setUint32(16, 16,         true);
+  view.setUint16(20, 1,          true);
+  view.setUint16(22, 1,          true);
+  view.setUint32(24, sampleRate, true);
+  view.setUint32(28, sampleRate * 2, true);
+  view.setUint16(32, 2,          true);
+  view.setUint16(34, 16,         true);
   writeStr(view, 36, 'data');
   view.setUint32(40, dataLen, true);
   let pos = 44;
@@ -1113,11 +1032,76 @@ function writeStr(view, offset, str) {
 }
 
 /* ══════════════════════════════════════════════════════════════════════════
+   HELPERS
+   ══════════════════════════════════════════════════════════════════════════ */
+function setProcessStep(id, state) {
+  const el = document.getElementById(id);
+  el.className = `proc-step${state === 'done' ? ' done' : state === 'active' ? ' active' : ''}`;
+}
+
+function toggleDetails() {
+  const wrap   = document.getElementById('details-wrap');
+  const toggle = document.getElementById('details-toggle');
+  const open   = wrap.classList.toggle('open');
+  toggle.classList.toggle('open', open);
+}
+
+function showError(msg) {
+  goStep(5);
+  const body = document.querySelector('#step-5');
+  body.querySelector('.error-box')?.remove();
+  const box = document.createElement('div');
+  box.className   = 'error-box';
+  box.textContent = msg;
+  body.insertBefore(box, body.querySelector('.btn-primary'));
+  document.querySelector('.scores-row').style.display   = 'none';
+  document.querySelector('.patient-msg').style.display  = 'none';
+  document.querySelector('#recs-list').style.display    = 'none';
+  document.querySelector('#details-toggle').style.display = 'none';
+}
+
+function restart() {
+  // Reset recording state
+  recordingPhase = 1;
+  pcmChunks = []; pcmChunks1 = []; pcmChunks2 = [];
+  elapsedSec = 0;
+
+  // Reset both recording UIs
+  [1, 2].forEach(n => {
+    document.getElementById(`ring-progress-${n}`).style.strokeDashoffset = CIRCUMFERENCE;
+    document.getElementById(`timer-display-${n}`).textContent = '0:00';
+    document.getElementById(`timer-label-${n}`).textContent   = 'pronto';
+    document.getElementById(`rec-status-${n}`).className      = 'rec-status';
+    document.getElementById(`rec-status-${n}`).textContent    = 'Toque para iniciar gravação';
+    document.getElementById(`record-btn-${n}`).classList.remove('recording');
+    document.getElementById(`icon-mic-${n}`).style.display    = 'block';
+    document.getElementById(`icon-stop-${n}`).style.display   = 'none';
+    document.getElementById(`volume-wrap-${n}`).style.display = 'none';
+  });
+
+  // Reset processing steps
+  ['ps-upload','ps-extract','ps-score','ps-result'].forEach(id => setProcessStep(id, ''));
+  setProcessStep('ps-upload', 'active');
+
+  // Reset results
+  document.querySelector('.scores-row').style.display    = '';
+  document.querySelector('.patient-msg').style.display   = '';
+  document.querySelector('#recs-list').style.display     = '';
+  document.querySelector('#details-toggle').style.display = '';
+  document.querySelector('.error-box')?.remove();
+  document.getElementById('details-wrap').classList.remove('open');
+  document.getElementById('details-toggle').classList.remove('open');
+
+  goStep(1);
+}
+
+function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
+
+/* ══════════════════════════════════════════════════════════════════════════
    INIT
    ══════════════════════════════════════════════════════════════════════════ */
 (async () => {
   await loadConfig();
-  setLang('pt');
 })();
 </script>
 </body>
