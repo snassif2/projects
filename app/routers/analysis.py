@@ -22,6 +22,8 @@ from app.config import Settings, get_settings
 from app.schemas import (
     AnalysisStatus,
     ClientConfig,
+    NarrativeRequest,
+    NarrativeResponse,
     ResultResponse,
     UploadUrlRequest,
     UploadUrlResponse,
@@ -29,6 +31,7 @@ from app.schemas import (
 )
 from app.services import store
 from app.services.audio_io import validate_file_size, validate_mime_type
+from app.services import narrative as narrative_svc
 
 logger = logging.getLogger(__name__)
 router = APIRouter()
@@ -139,3 +142,30 @@ def get_client_config(settings: Settings = Depends(get_settings)) -> ClientConfi
         allowed_mime_types=settings.allowed_mime_types,
         default_locale=settings.default_locale,
     )
+
+
+# ── POST /narrative ────────────────────────────────────────────────────────────
+
+@router.post("/narrative", response_model=NarrativeResponse)
+def generate_narrative(
+    body: NarrativeRequest,
+    settings: Settings = Depends(get_settings),
+) -> NarrativeResponse:
+    """
+    Single LLM call (Claude Haiku) that synthesises all three acoustic results
+    + patient anamnesis into a clinical narrative (PT-BR), GRBAS estimate, and
+    refined action recommendation.
+
+    Returns 503 if the API key is not configured.
+    The frontend treats this endpoint as optional — it falls back to the
+    rule-based messages on any non-2xx response.
+    """
+    if not settings.anthropic_api_key:
+        raise HTTPException(status_code=503, detail="Narrative generation not configured.")
+
+    result = narrative_svc.generate(body, settings.anthropic_api_key, settings.llm_model)
+    if result is None:
+        raise HTTPException(status_code=502, detail="Narrative generation failed.")
+
+    logger.info("Narrative generated for anamnesis age=%d sexo=%s", body.anamnesis.idade, body.anamnesis.sexo)
+    return result

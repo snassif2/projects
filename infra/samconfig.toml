@@ -4,6 +4,6 @@ version = 0.1
 stack_name = "vozlab-voice-analysis"
 region = "us-east-1"
 capabilities = "CAPABILITY_IAM"
-parameter_overrides = "CorsOrigins=\"[\\\"*\\\"]\""
+parameter_overrides = "CorsOrigins=\"[\\\"*\\\"]\" AnthropicApiKey=\"\""
 confirm_changeset = false
 resolve_s3 = true

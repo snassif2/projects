@@ -403,6 +403,89 @@
     .volume-fill.low  { background: var(--ink-muted); }
     .volume-fill.loud { background: var(--amber); }
 
+    /* ── Anamnesis form ─────────────────────────────────────────────────── */
+    .anamnesis-form {
+      background: rgba(255,255,255,.02);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 16px 18px;
+      margin: 16px 0 20px;
+      display: flex; flex-direction: column; gap: 14px;
+    }
+    .anamnesis-row {
+      display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
+    }
+    .anamnesis-label {
+      font-size: .78rem; color: var(--ink-muted);
+      font-weight: 500; min-width: 60px;
+    }
+    .radio-group { display: flex; gap: 8px; }
+    .radio-pill {
+      display: flex; align-items: center; gap: 6px;
+      padding: 5px 12px; border-radius: 20px;
+      border: 1px solid var(--border);
+      cursor: pointer; font-size: .82rem; color: var(--ink-muted);
+      transition: all .15s;
+    }
+    .radio-pill input { display: none; }
+    .radio-pill:has(input:checked) {
+      border-color: var(--teal); color: var(--teal);
+      background: rgba(45,212,191,.08);
+    }
+    .anamnesis-input {
+      flex: 1; min-width: 80px;
+      background: transparent; border: 1px solid var(--border);
+      border-radius: 8px; padding: 6px 10px;
+      color: var(--ink); font-family: inherit; font-size: .85rem;
+      outline: none; transition: border-color .15s;
+    }
+    .anamnesis-input:focus { border-color: var(--teal); }
+    .anamnesis-input::placeholder { color: var(--ink-muted); }
+
+    /* ── LLM narrative ──────────────────────────────────────────────────── */
+    .narrative-box {
+      background: rgba(45,212,191,.04);
+      border: 1px solid var(--teal-dim);
+      border-radius: 10px; padding: 16px 18px;
+      font-size: .9rem; color: var(--ink);
+      line-height: 1.6; margin-bottom: 20px;
+    }
+    .narrative-label {
+      font-size: .68rem; font-weight: 600;
+      color: var(--teal); text-transform: uppercase;
+      letter-spacing: .08em; margin-bottom: 8px;
+    }
+
+    /* ── GRBAS panel ────────────────────────────────────────────────────── */
+    .grbas-row {
+      display: flex; justify-content: center; gap: 10px;
+      flex-wrap: wrap; margin-bottom: 20px;
+    }
+    .grbas-cell {
+      display: flex; flex-direction: column;
+      align-items: center; gap: 4px;
+      background: rgba(255,255,255,.02);
+      border: 1px solid var(--border);
+      border-radius: 8px; padding: 10px 14px; min-width: 52px;
+    }
+    .grbas-key {
+      font-family: 'DM Serif Display', serif;
+      font-size: 1rem; color: var(--ink);
+    }
+    .grbas-val {
+      font-size: .72rem; font-weight: 600;
+      padding: 2px 6px; border-radius: 10px;
+    }
+    .grbas-0 { background: rgba(74,222,128,.1);  color: var(--green); }
+    .grbas-1 { background: rgba(251,191,36,.1);  color: var(--amber); }
+    .grbas-2 { background: rgba(251,146,60,.12); color: #fb923c; }
+    .grbas-3 { background: rgba(248,113,113,.12);color: var(--red); }
+    .grbas-section-label {
+      font-size: .68rem; font-weight: 600;
+      color: var(--ink-muted); text-transform: uppercase;
+      letter-spacing: .07em; text-align: center; margin-bottom: 8px;
+    }
+
     /* ── Error state ───────────────────────────────────────────────────── */
     .error-box {
       background: rgba(248,113,113,.08);
@@ -463,12 +546,38 @@
         </li>
       </ul>
 
+      <div class="anamnesis-form">
+        <div class="anamnesis-row">
+          <span class="anamnesis-label">Sexo</span>
+          <div class="radio-group">
+            <label class="radio-pill">
+              <input type="radio" name="sexo" value="masculino" id="sexo-m"> ♂ Masculino
+            </label>
+            <label class="radio-pill">
+              <input type="radio" name="sexo" value="feminino" id="sexo-f"> ♀ Feminino
+            </label>
+          </div>
+        </div>
+        <div class="anamnesis-row">
+          <span class="anamnesis-label">Idade</span>
+          <input class="anamnesis-input" type="number" id="anamnesis-idade"
+                 min="5" max="120" placeholder="anos" style="max-width:90px">
+        </div>
+        <div class="anamnesis-row" style="align-items:flex-start">
+          <span class="anamnesis-label" style="padding-top:6px">Queixa</span>
+          <textarea class="anamnesis-input" id="anamnesis-queixa"
+                    rows="2" maxlength="300"
+                    placeholder="Rouquidão, cansaço vocal… (opcional)"
+                    style="resize:none; line-height:1.5"></textarea>
+        </div>
+      </div>
+
       <p class="disclaimer">
         ⚠️ Esta é uma triagem informativa, não um diagnóstico clínico.
         Os resultados não substituem avaliação por fonoaudiólogo ou médico.
       </p>
 
-      <button class="btn btn-primary" onclick="goStep(2)">Iniciar triagem</button>
+      <button class="btn btn-primary" onclick="startTriagem()">Iniciar triagem</button>
     </div>
 
     <!-- ── Step 2: Fonação Sustentada ───────────────────────────────── -->
@@ -682,7 +791,18 @@
         </div>
       </div>
 
+      <!-- LLM narrative — shown when /narrative succeeds, otherwise patient-msg fallback -->
+      <div id="narrative-box" class="narrative-box" style="display:none">
+        <div class="narrative-label">Avaliação clínica</div>
+        <p id="narrative-text"></p>
+      </div>
       <p class="patient-msg" id="patient-msg"></p>
+
+      <!-- GRBAS panel — shown when /narrative succeeds -->
+      <div id="grbas-panel" style="display:none; margin-bottom:20px;">
+        <div class="grbas-section-label">Estimativa GRBAS</div>
+        <div class="grbas-row" id="grbas-row"></div>
+      </div>
 
       <!-- DDK panel — only shown when ddk_analysis is present -->
       <div id="ddk-panel" style="display:none; margin-bottom:20px;">
@@ -741,9 +861,29 @@ function goStep(n) {
   });
 }
 
+function startTriagem() {
+  // Collect anamnesis (sex required, age required)
+  const sexoEl = document.querySelector('input[name="sexo"]:checked');
+  const idadeEl = document.getElementById('anamnesis-idade');
+  const queixaEl = document.getElementById('anamnesis-queixa');
+
+  if (!sexoEl) { idadeEl.focus(); alert('Por favor, selecione o sexo antes de continuar.'); return; }
+  const idade = parseInt(idadeEl.value, 10);
+  if (!idade || idade < 5 || idade > 120) { idadeEl.focus(); return; }
+
+  anamnesis = {
+    sexo:   sexoEl.value,
+    idade:  idade,
+    queixa: queixaEl.value.trim(),
+  };
+  goStep(2);
+}
+
 /* ══════════════════════════════════════════════════════════════════════════
    RECORDING STATE
    ══════════════════════════════════════════════════════════════════════════ */
+let anamnesis = { sexo: '', idade: 0, queixa: '' };
+
 let recordingPhase = 1;   // 1 = Ahhh, 2 = CAPE-V, 3 = DDK
 let pcmChunks      = [];  // current recording chunks
 let pcmChunks1     = [];  // saved after phase 1
@@ -953,6 +1093,10 @@ async function handleRecordingsDone() {
     setProcessStep('ps-extract', 'done');
     setProcessStep('ps-score', 'done');
     setProcessStep('ps-result', 'active');
+
+    // 4 — Optional: LLM narrative (fire-and-forget race — show results regardless)
+    const narrativePromise = fetchNarrative(result1, result2, result3);
+
     await sleep(400);
     setProcessStep('ps-result', 'done');
     await sleep(300);
@@ -960,9 +1104,42 @@ async function handleRecordingsDone() {
     renderResults(result1, result2, result3);
     goStep(6);
 
+    // Render narrative when it arrives (may be slightly after results appear)
+    narrativePromise.then(n => { if (n) renderNarrative(n); }).catch(() => {});
+
   } catch (err) {
     showError(err.message || 'Não foi possível analisar o áudio. Tente novamente.');
   }
+}
+
+async function fetchNarrative(r1, r2, r3) {
+  try {
+    const resp = await fetch(`${API_BASE}/narrative`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ anamnesis, phonation: r1, speech: r2, ddk: r3 }),
+    });
+    if (!resp.ok) return null;
+    return await resp.json();
+  } catch (_) { return null; }
+}
+
+function renderNarrative(n) {
+  // Show narrative box (replaces the generic patient-msg prominence)
+  document.getElementById('narrative-text').textContent = n.narrative_pt;
+  document.getElementById('narrative-box').style.display = '';
+  document.getElementById('patient-msg').style.display   = 'none';
+
+  // GRBAS
+  const labels = { G: 'Grau', R: 'Rugos.', B: 'Soproso', A: 'Astenia', S: 'Tensão' };
+  document.getElementById('grbas-row').innerHTML = Object.entries(labels).map(([k, lbl]) => `
+    <div class="grbas-cell">
+      <span class="grbas-key">${k}</span>
+      <span class="grbas-val grbas-${n.grbas[k]}">${n.grbas[k]}</span>
+      <span style="font-size:.6rem;color:var(--ink-muted)">${lbl}</span>
+    </div>
+  `).join('');
+  document.getElementById('grbas-panel').style.display = '';
 }
 
 async function pollResult(audioId, maxAttempts = 30, intervalMs = 1000) {
@@ -1205,10 +1382,18 @@ function showError(msg) {
   document.querySelector('.patient-msg').style.display  = 'none';
   document.querySelector('#recs-list').style.display    = 'none';
   document.querySelector('#details-toggle').style.display = 'none';
-  document.getElementById('ddk-panel').style.display    = 'none';
+  document.getElementById('ddk-panel').style.display     = 'none';
+  document.getElementById('narrative-box').style.display = 'none';
+  document.getElementById('grbas-panel').style.display   = 'none';
 }
 
 function restart() {
+  // Reset anamnesis
+  anamnesis = { sexo: '', idade: 0, queixa: '' };
+  document.querySelectorAll('input[name="sexo"]').forEach(r => r.checked = false);
+  document.getElementById('anamnesis-idade').value = '';
+  document.getElementById('anamnesis-queixa').value = '';
+
   // Reset recording state
   recordingPhase = 1;
   pcmChunks = []; pcmChunks1 = []; pcmChunks2 = []; pcmChunks3 = [];
@@ -1236,8 +1421,11 @@ function restart() {
   document.querySelector('.patient-msg').style.display   = '';
   document.querySelector('#recs-list').style.display     = '';
   document.querySelector('#details-toggle').style.display = '';
-  document.getElementById('ddk-panel').style.display     = 'none';
+  document.getElementById('ddk-panel').style.display      = 'none';
   document.getElementById('details-ddk-section').style.display = 'none';
+  document.getElementById('narrative-box').style.display  = 'none';
+  document.getElementById('grbas-panel').style.display    = 'none';
+  document.getElementById('patient-msg').style.display    = '';
   document.querySelector('.error-box')?.remove();
   document.getElementById('details-wrap').classList.remove('open');
   document.getElementById('details-toggle').classList.remove('open');

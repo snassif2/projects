@@ -94,6 +94,10 @@ class Settings(BaseSettings):
     ddk_normal_max_cv_pct:  float = 20.0  # irregularity threshold (CV%)
     ddk_max_duration_seconds: int = 10    # recording cap for DDK step
 
+    # ── LLM narrative (optional — graceful degradation if not set) ───────────
+    anthropic_api_key: str = ""      # VOZLAB_ANTHROPIC_API_KEY env var
+    llm_model: str = "claude-haiku-4-5-20251001"
+
     # ── Locale ────────────────────────────────────────────────────────────────
     default_locale: str = "pt-BR"    # "pt-BR" | "en"
 

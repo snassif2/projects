@@ -7,6 +7,11 @@ Parameters:
     Type: String
     Default: '["*"]'
     Description: 'JSON array of allowed CORS origins, e.g. ["https://yourdomain.com"]'
+  AnthropicApiKey:
+    Type: String
+    Default: ''
+    NoEcho: true
+    Description: 'Anthropic API key for LLM narrative generation (optional — feature disabled if empty)'
 
 Resources:
 
@@ -116,15 +121,16 @@ Resources:
       Runtime: python3.12
       Architectures: [x86_64]
       MemorySize: 256
-      Timeout: 10
+      Timeout: 15
       Layers:
         - !Ref AudioProcessingLayer
       Environment:
         Variables:
-          VOZLAB_S3_BUCKET:      !Ref AudioBucket
-          VOZLAB_DYNAMODB_TABLE: !Ref ResultsTable
-          VOZLAB_AWS_REGION:     !Ref AWS::Region
-          VOZLAB_CORS_ORIGINS:   !Ref CorsOrigins
+          VOZLAB_S3_BUCKET:          !Ref AudioBucket
+          VOZLAB_DYNAMODB_TABLE:     !Ref ResultsTable
+          VOZLAB_AWS_REGION:         !Ref AWS::Region
+          VOZLAB_CORS_ORIGINS:       !Ref CorsOrigins
+          VOZLAB_ANTHROPIC_API_KEY:  !Ref AnthropicApiKey
       Policies:
         - S3WritePolicy:
             BucketName: !Ref AudioBucket

@@ -136,6 +136,38 @@ class VoiceAnalysisResult(BaseModel):
     ddk_analysis: DDKAnalysis | None = None
 
 
+# ── Narrative / LLM schemas ───────────────────────────────────────────────
+
+class Anamnesis(BaseModel):
+    """Brief pre-recording patient context collected by the frontend."""
+    sexo: str = Field(description="masculino | feminino")
+    idade: int = Field(ge=5, le=120, description="Age in years")
+    queixa: str = Field(default="", max_length=300, description="Main complaint (optional)")
+
+
+class GRBASScore(BaseModel):
+    G: int = Field(ge=0, le=3, description="Overall grade")
+    R: int = Field(ge=0, le=3, description="Roughness")
+    B: int = Field(ge=0, le=3, description="Breathiness")
+    A: int = Field(ge=0, le=3, description="Asthenia")
+    S: int = Field(ge=0, le=3, description="Strain")
+
+
+class NarrativeRequest(BaseModel):
+    """Body for POST /narrative"""
+    anamnesis: Anamnesis
+    phonation: VoiceAnalysisResult
+    speech:    VoiceAnalysisResult
+    ddk:       VoiceAnalysisResult
+
+
+class NarrativeResponse(BaseModel):
+    """Returned by POST /narrative"""
+    narrative_pt:    str
+    grbas:           GRBASScore
+    action_required: ActionRequired
+
+
 # ── API request / response wrappers ──────────────────────────────────────────
 
 class UploadUrlRequest(BaseModel):

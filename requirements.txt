@@ -9,3 +9,6 @@ uvicorn[standard]==0.29.0       # local dev only (not needed on Lambda)
 
 # HTTP transport (needed by multipart uploads)
 python-multipart==0.0.9
+
+# LLM narrative synthesis (Anthropic Claude Haiku — ~2 MB, lives in function package not layer)
+anthropic>=0.40.0
